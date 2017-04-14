@@ -9,27 +9,45 @@ using System.Threading.Tasks;
 
 namespace CloudantDotNet.Services
 {
-    public class CloudantService : ICloudantService
+    public class CouponsCloudantService : ICouponsCloudantService
     {
-        private static readonly string _dbName = "todos";
+        private static readonly string _dbName = "coupons";
         private readonly Creds _cloudantCreds;
         private readonly UrlEncoder _urlEncoder;
 
-        public CloudantService(Creds creds, UrlEncoder urlEncoder)
+        public CouponsCloudantService(Creds creds, UrlEncoder urlEncoder)
         {
             _cloudantCreds = creds;
             _urlEncoder = urlEncoder;
         }
 
-        public async Task<dynamic> CreateAsync(ToDoItem item)
+        public async Task<dynamic> CreateAsync(Coupon item)
         {
             using (var client = CloudantClient())
             {
                 var response = await client.PostAsJsonAsync(_dbName, item);
                 if (response.IsSuccessStatusCode)
                 {
-                    var responseJson = await response.Content.ReadAsAsync<ToDoItem>();
-                    return JsonConvert.SerializeObject(new { id = responseJson.id, rev = responseJson.rev });
+                    var responseJson = await response.Content.ReadAsAsync<Coupon>();
+                    return JsonConvert.SerializeObject(
+                        new
+                        {
+                            User = responseJson.User
+                        ,
+                            GameType = responseJson.GameType
+                        ,
+                            Numbers = responseJson.Numbers
+                        ,
+                            PlayTime = responseJson.PlayTime
+                        ,
+                            LotteryTime = responseJson.LotteryTime
+                        ,
+                            ToRemind = responseJson.ToRemind
+                        ,
+                            ServerCalled = responseJson.ServerCalled
+                        ,
+                            WinCount = responseJson.WinCount
+                        });
                 }
                 string msg = "Failure to POST. Status Code: " + response.StatusCode + ". Reason: " + response.ReasonPhrase;
                 Console.WriteLine(msg);
@@ -37,15 +55,35 @@ namespace CloudantDotNet.Services
             }
         }
 
-        public async Task<dynamic> DeleteAsync(ToDoItem item)
+        public async Task<dynamic> DeleteAsync(Coupon item)
         {
             using (var client = CloudantClient())
             {
-                var response = await client.DeleteAsync(_dbName + "/" + _urlEncoder.Encode(item.id) + "?rev=" + _urlEncoder.Encode(item.rev));
+                var response = await client.DeleteAsync(_dbName + "/" + _urlEncoder.Encode(item.CouponId.ToString()));
                 if (response.IsSuccessStatusCode)
                 {
-                    var responseJson = await response.Content.ReadAsAsync<ToDoItem>();
-                    return JsonConvert.SerializeObject(new { id = responseJson.id, rev = responseJson.rev });
+                    var responseJson = await response.Content.ReadAsAsync<Coupon>();
+                    return JsonConvert.SerializeObject(
+                        new
+                        {
+                            CouponId = responseJson.CouponId
+                        ,
+                            User = responseJson.User
+                        ,
+                            GameType = responseJson.GameType
+                        ,
+                            Numbers = responseJson.Numbers
+                        ,
+                            PlayTime = responseJson.PlayTime
+                        ,
+                            LotteryTime = responseJson.LotteryTime
+                        ,
+                            ToRemind = responseJson.ToRemind
+                        ,
+                            ServerCalled = responseJson.ServerCalled
+                        ,
+                            WinCount = responseJson.WinCount
+                        });
                 }
                 string msg = "Failure to DELETE. Status Code: " + response.StatusCode + ". Reason: " + response.ReasonPhrase;
                 Console.WriteLine(msg);
@@ -68,15 +106,35 @@ namespace CloudantDotNet.Services
             }
         }
 
-        public async Task<string> UpdateAsync(ToDoItem item)
+        public async Task<string> UpdateAsync(Coupon item)
         {
             using (var client = CloudantClient())
             {
-                var response = await client.PutAsJsonAsync(_dbName + "/" + _urlEncoder.Encode(item.id) + "?rev=" + _urlEncoder.Encode(item.rev), item);
+                var response = await client.PutAsJsonAsync(_dbName + "/" + _urlEncoder.Encode(item.CouponId.ToString()), item);
                 if (response.IsSuccessStatusCode)
                 {
-                    var responseJson = await response.Content.ReadAsAsync<ToDoItem>();
-                    return JsonConvert.SerializeObject(new { id = responseJson.id, rev = responseJson.rev });
+                    var responseJson = await response.Content.ReadAsAsync<Coupon>();
+                    return JsonConvert.SerializeObject(
+                        new
+                        {
+                            CouponId = responseJson.CouponId
+                        ,
+                            User = responseJson.User
+                        ,
+                            GameType = responseJson.GameType
+                        ,
+                            Numbers = responseJson.Numbers
+                        ,
+                            PlayTime = responseJson.PlayTime
+                        ,
+                            LotteryTime = responseJson.LotteryTime
+                        ,
+                            ToRemind = responseJson.ToRemind
+                        ,
+                            ServerCalled = responseJson.ServerCalled
+                        ,
+                            WinCount = responseJson.WinCount
+                        });
                 }
                 string msg = "Failure to PUT. Status Code: " + response.StatusCode + ". Reason: " + response.ReasonPhrase;
                 Console.WriteLine(msg);
@@ -95,9 +153,9 @@ namespace CloudantDotNet.Services
                     response = await client.PutAsync(_dbName, null);
                     if (response.IsSuccessStatusCode)
                     {
-                        Task t1 = CreateAsync(JsonConvert.DeserializeObject<ToDoItem>("{ 'text': 'Sample 1' }"));
-                        Task t2 = CreateAsync(JsonConvert.DeserializeObject<ToDoItem>("{ 'text': 'Sample 2' }"));
-                        Task t3 = CreateAsync(JsonConvert.DeserializeObject<ToDoItem>("{ 'text': 'Sample 3' }"));
+                        Task t1 = CreateAsync(JsonConvert.DeserializeObject<Coupon>("{ 'text': 'Sample 1' }"));
+                        Task t2 = CreateAsync(JsonConvert.DeserializeObject<Coupon>("{ 'text': 'Sample 2' }"));
+                        Task t3 = CreateAsync(JsonConvert.DeserializeObject<Coupon>("{ 'text': 'Sample 3' }"));
                         await Task.WhenAll(t1, t2, t3);
                     }
                     else
@@ -106,7 +164,7 @@ namespace CloudantDotNet.Services
                     }
                 }
             }
-        } 
+        }
 
         private HttpClient CloudantClient()
         {
@@ -123,6 +181,11 @@ namespace CloudantDotNet.Services
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", auth);
             return client;
+        }
+
+        public Task<dynamic> CreateListAsync(CouponList items)
+        {
+            throw new NotImplementedException();
         }
     }
 

@@ -8,15 +8,15 @@ namespace CloudantDotNet.Controllers
     [Route("api/[controller]")]
     public class DbController : Controller
     {
-        private readonly ICloudantService _cloudantService;
+        private readonly ICouponsCloudantService _cloudantService;
 
-        public DbController(ICloudantService cloudantService)
+        public DbController(ICouponsCloudantService cloudantService)
         {
             _cloudantService = cloudantService;
         }
 
         [HttpPost]
-        public async Task<dynamic> Create(ToDoItem item)
+        public async Task<dynamic> Create(Coupon item)
         {
             return await _cloudantService.CreateAsync(item);
         }
@@ -28,13 +28,13 @@ namespace CloudantDotNet.Controllers
         }
 
         [HttpPut]
-        public async Task<string> Update(ToDoItem item)
+        public async Task<string> Update(Coupon item)
         {
             return await _cloudantService.UpdateAsync(item);
         }
 
         [HttpDelete]
-        public async Task<dynamic> Delete(ToDoItem item)
+        public async Task<dynamic> Delete(Coupon item)
         {
             return await _cloudantService.DeleteAsync(item);
         }
