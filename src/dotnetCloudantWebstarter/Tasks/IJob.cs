@@ -12,6 +12,8 @@ namespace CloudantDotNet.Tasks
         int startMin { get; set; }
         int endHour { get; set; }
         int endMin { get; set; }
+        DateTime lastWorked { get; set; }
+        TimeSpan onceIn { get; set; }
         void StartJob();
     }
 }

@@ -12,12 +12,15 @@ namespace CloudantDotNet.Tasks
         public int startMin { get; set; } = 0;
         public int endHour { get; set; } = 23;
         public int endMin { get; set; } = 59;
+        public TimeSpan onceIn { get; set; } = TimeSpan.FromMinutes(10);
+        public DateTime lastWorked { get; set; }
 
-        
 
         public void StartJob()
         {
-            Console.WriteLine("CekilisJob calisti" + DateTime.UtcNow);
+
+
+            Console.WriteLine("CekilisJob calisti:" + DateTime.UtcNow.GetTurkeyTime());
         }
     }
 }

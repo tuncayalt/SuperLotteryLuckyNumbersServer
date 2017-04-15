@@ -31,18 +31,6 @@ namespace CloudantDotNet.Tasks
             });
         }
 
-        //private void AddCache()
-        //{
-        //    result = cache.Set(
-        //                    key,
-        //                    new object(),
-        //                    new MemoryCacheEntryOptions()
-        //                    .SetPriority(CacheItemPriority.NeverRemove)
-        //                    .SetAbsoluteExpiration(DateTimeOffset.Now.AddMinutes(1))
-        //                    .RegisterPostEvictionCallback(StartJobs)
-        //                    );
-        //}
-
         public void StartJobs()
         {
             foreach (IJob job in jobs)
@@ -51,6 +39,7 @@ namespace CloudantDotNet.Tasks
                 {
                     Task jobTask = new Task(job.StartJob);
                     jobTask.Start();
+                    job.lastWorked = DateTime.UtcNow.GetTurkeyTime();
                 }
 
             }
@@ -58,22 +47,29 @@ namespace CloudantDotNet.Tasks
 
         private bool JobWillStart(IJob job)
         {
-            return DayOk(job) && StartTimeOk(job) && EndTimeOk(job);
+            return DayOk(job) && StartTimeOk(job) && EndTimeOk(job) && OnceInOk(job);
+        }
+
+        private bool OnceInOk(IJob job)
+        {
+            if (job.lastWorked > DateTime.UtcNow.GetTurkeyTime() - job.onceIn)
+                return false;
+            return true;
         }
 
         private bool EndTimeOk(IJob job)
         {
-            return job.endHour >= DateTime.UtcNow.Hour && job.endMin >= DateTime.UtcNow.Minute;
+            return job.endHour >= DateTime.UtcNow.GetTurkeyTime().Hour && job.endMin >= DateTime.UtcNow.Minute;
         }
 
         private bool StartTimeOk(IJob job)
         {
-            return job.startHour <= DateTime.UtcNow.Hour && job.startMin <= DateTime.UtcNow.Minute;
+            return job.startHour <= DateTime.UtcNow.GetTurkeyTime().Hour && job.startMin <= DateTime.UtcNow.Minute;
         }
 
         private static bool DayOk(IJob job)
         {
-            return job.workDay.Contains(DateTime.Today.DayOfWeek);
+            return job.workDay.Contains(DateTime.Now.GetTurkeyTime().DayOfWeek);
         }
     }
 }
