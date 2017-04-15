@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using CloudantDotNet.Services;
 using CloudantDotNet.Tasks;
+using System.Text.Encodings.Web;
 
 namespace CloudantDotNet
 {
@@ -57,11 +58,16 @@ namespace CloudantDotNet
                 password = Configuration["cloudantNoSQLDB:0:credentials:password"],
                 host = Configuration["cloudantNoSQLDB:0:credentials:host"]
             };
-            jobManager = new JobManager();
+            var cekilisCloudantService = new CekilisCloudantService(creds, UrlEncoder.Default);
+            var couponsCloudantService = new CouponsCloudantService(creds, UrlEncoder.Default);
+            var mpService = new MilliPiyangoService();
+            jobManager = new JobManager(cekilisCloudantService, couponsCloudantService, mpService);
             services.AddSingleton(typeof(CloudantDotNet.Models.Creds), creds);
             services.AddSingleton(typeof(JobManager), jobManager);
             services.AddTransient<ICouponsCloudantService, CouponsCloudantService>();
             services.AddTransient<ICekilisCloudantService, CekilisCloudantService>();
+            services.AddTransient<IMilliPiyangoService, MilliPiyangoService>();
+
         }
 
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)

@@ -3,6 +3,8 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using CloudantDotNet.Services;
 
 namespace CloudantDotNet.Tasks
 {
@@ -10,10 +12,12 @@ namespace CloudantDotNet.Tasks
     {
         List<IJob> jobs;
 
-        public JobManager()
+        public JobManager(ICekilisCloudantService cloudantService, ICouponsCloudantService couponsService, IMilliPiyangoService mpService)
         {
+
             jobs = new List<IJob>();
-            CekilisJob cekilisJob = new CekilisJob();
+
+            CekilisJob cekilisJob = new CekilisJob(cloudantService, mpService);
             jobs.Add(cekilisJob);
 
             CallJobsRepeatedly(TimeSpan.FromSeconds(60));
@@ -31,7 +35,7 @@ namespace CloudantDotNet.Tasks
             });
         }
 
-        public void StartJobs()
+        private void StartJobs()
         {
             foreach (IJob job in jobs)
             {
