@@ -6,12 +6,14 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using CloudantDotNet.Services;
+using CloudantDotNet.Tasks;
 
 namespace CloudantDotNet
 {
     public class Startup
     {
         public IConfiguration Configuration { get; set; }
+        public JobManager jobManager;
 
         public Startup(IHostingEnvironment env)
         {
@@ -55,7 +57,9 @@ namespace CloudantDotNet
                 password = Configuration["cloudantNoSQLDB:0:credentials:password"],
                 host = Configuration["cloudantNoSQLDB:0:credentials:host"]
             };
+            jobManager = new JobManager();
             services.AddSingleton(typeof(CloudantDotNet.Models.Creds), creds);
+            services.AddSingleton(typeof(JobManager), jobManager);
             services.AddTransient<ICouponsCloudantService, CouponsCloudantService>();
             services.AddTransient<ICekilisCloudantService, CekilisCloudantService>();
         }
@@ -70,6 +74,7 @@ namespace CloudantDotNet
             app.UseDeveloperExceptionPage();
             app.UseStaticFiles();
             app.UseMvcWithDefaultRoute();
+            
         }
 
         public static void Main(string[] args)
@@ -85,6 +90,8 @@ namespace CloudantDotNet
                         .Build();
 
             host.Run();
+
+            
         }
     }
 }
