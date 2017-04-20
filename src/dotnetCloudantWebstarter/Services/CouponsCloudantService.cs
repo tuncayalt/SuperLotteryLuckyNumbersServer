@@ -183,7 +183,42 @@ namespace CloudantDotNet.Services
             return client;
         }
 
-        public Task<dynamic> CreateListAsync(CouponList items)
+        public async Task<dynamic> CreateListAsync(CouponList items)
+        {
+            using (var client = CloudantClient())
+            {
+                var response = await client.PostAsJsonAsync(_dbName, items.Coupons);
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseJson = await response.Content.ReadAsAsync<Coupon>();
+                    return "Coupons inserted";
+                }
+                string msg = "Failure to POST. Status Code: " + response.StatusCode + ". Reason: " + response.ReasonPhrase;
+                Console.WriteLine(msg);
+                return JsonConvert.SerializeObject(new { msg = "Failure to POST. Status Code: " + response.StatusCode + ". Reason: " + response.ReasonPhrase });
+            }
+        }
+
+        public Task<dynamic> GetAllByUserName(string userName)
+        {
+            //CekilisSelector cekSelector = new CekilisSelector();
+            //cekSelector.selector = new CekilisSelector.Selector();
+            //cekSelector.selector.tarih = new CekilisSelector.tarih();
+            //cekSelector.selector.tarih.gt = 0;
+            //cekSelector.fields = new List<string>();
+            //cekSelector.fields.Add("tarih");
+            //cekSelector.fields.Add("tarih_view");
+            //cekSelector.fields.Add("numbers");
+            //cekSelector.limit = 1;
+            //cekSelector.sort = new List<CekilisSelector.Sort>();
+            //cekSelector.sort.Add(new CekilisSelector.Sort()
+            //{
+            //    tarih = "desc"
+            //});
+            throw new NotImplementedException();
+        }
+
+        public Task<dynamic> GetAllByTarih(string tarih)
         {
             throw new NotImplementedException();
         }

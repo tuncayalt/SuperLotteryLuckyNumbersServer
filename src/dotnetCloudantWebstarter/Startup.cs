@@ -60,13 +60,18 @@ namespace CloudantDotNet
             };
             var cekilisCloudantService = new CekilisCloudantService(creds, UrlEncoder.Default);
             var couponsCloudantService = new CouponsCloudantService(creds, UrlEncoder.Default);
+            var userService = new UserCloudantService(creds, UrlEncoder.Default);
             var mpService = new MilliPiyangoService();
-            jobManager = new JobManager(cekilisCloudantService, couponsCloudantService, mpService);
+            var firebaseService = new FirebasePushService();
+            
+            jobManager = new JobManager(cekilisCloudantService, couponsCloudantService, mpService, userService, firebaseService);
             services.AddSingleton(typeof(CloudantDotNet.Models.Creds), creds);
             services.AddSingleton(typeof(JobManager), jobManager);
             services.AddTransient<ICouponsCloudantService, CouponsCloudantService>();
             services.AddTransient<ICekilisCloudantService, CekilisCloudantService>();
+            services.AddTransient<IUserCloudantService, UserCloudantService>();
             services.AddTransient<IMilliPiyangoService, MilliPiyangoService>();
+            services.AddTransient<IPushService, FirebasePushService>();
 
         }
 

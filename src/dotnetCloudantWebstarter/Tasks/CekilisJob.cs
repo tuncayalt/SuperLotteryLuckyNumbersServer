@@ -9,22 +9,25 @@ namespace CloudantDotNet.Tasks
 {
     public class CekilisJob : IJob
     {
-        public DayOfWeek[] workDay { get; set; } = { DayOfWeek.Thursday, DayOfWeek.Saturday, DayOfWeek.Friday };
+        public DayOfWeek[] workDay { get; set; } = { DayOfWeek.Thursday, DayOfWeek.Tuesday, DayOfWeek.Wednesday };
         public int startHour { get; set; } = 10;
         public int startMin { get; set; } = 0;
         public int endHour { get; set; } = 23;
         public int endMin { get; set; } = 59;
-        public TimeSpan onceIn { get; set; } = TimeSpan.FromMinutes(1);
+        public TimeSpan onceIn { get; set; } = TimeSpan.FromMinutes(10);
         public DateTime lastWorked { get; set; }
 
         ICekilisCloudantService _cloudantService;
         IMilliPiyangoService _mpService;
+
+        public event EventHandler<CekilisEventArgs> onYeniCekilis;
 
         public CekilisJob(ICekilisCloudantService cloudantService, IMilliPiyangoService mpService)
         {
             _cloudantService = cloudantService;
             _mpService = mpService;
         }
+
 
         public void StartJob()
         {
@@ -39,7 +42,7 @@ namespace CloudantDotNet.Tasks
             {
                 Cekilis cekilisDb = await GetCekilisFromDB();
 
-                if (DateTime.UtcNow.GetTurkeyTime() - cekilisDb.GetDateTime() <= TimeSpan.FromDays(5))
+                if (DateTime.UtcNow.GetTurkeyTime() - cekilisDb.GetDateTime() <= TimeSpan.FromDays(6))
                     return;
 
                 DateTime dateInMP = await GetDateFromMP();
@@ -49,12 +52,26 @@ namespace CloudantDotNet.Tasks
 
                 Cekilis cekilisMP = await GetCekilisFromMP(dateInMP);
 
-                await InsertCekilisToDB(cekilisMP);
+                Cekilis cekilisInserted = await InsertCekilisToDB(cekilisMP);
+                if (cekilisInserted != null && !string.IsNullOrWhiteSpace(cekilisInserted.numbers))
+                {
+                    InvokeYeniCekilisEvent(cekilisInserted);
+                }
+
             }
             catch (Exception ex)
             {
-                Console.WriteLine("CekilisJob UpdateCekilis exception" + ex.Message);
+                Console.WriteLine("CekilisJob exception" + ex.Message);
             }
+        }
+
+        private void InvokeYeniCekilisEvent(Cekilis cekilisInserted)
+        {
+            CekilisEventArgs args = new CekilisEventArgs()
+            {
+                numbers = cekilisInserted.numbers
+            };
+            onYeniCekilis(this, args);
         }
 
         private async Task<Cekilis> InsertCekilisToDB(Cekilis cekilisMP)
@@ -76,5 +93,10 @@ namespace CloudantDotNet.Tasks
         {
             return await _cloudantService.GetAsync();
         }
+    }
+
+    public class CekilisEventArgs : EventArgs
+    {
+        internal string numbers;
     }
 }

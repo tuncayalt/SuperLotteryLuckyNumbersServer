@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
+using System.Threading.Tasks;
 
-namespace CloudantDotNet.Models
+namespace dotnetCloudantWebstarter.Models
 {
-
-    public class CekilisSelector
+    public class CouponSelector
     {
         public Selector selector { get; set; }
         public List<string> fields { get; set; }
@@ -12,7 +14,7 @@ namespace CloudantDotNet.Models
         public int limit { get; set; }
 
         [DataContract]
-        public class tarih
+        public class _id
         {
             [DataMember(Name = "$gt")]
             public int gt { get; set; }
@@ -20,7 +22,7 @@ namespace CloudantDotNet.Models
 
         public class Selector
         {
-            public tarih tarih { get; set; }
+            public string _id { get; set; }
         }
 
         public class Sort

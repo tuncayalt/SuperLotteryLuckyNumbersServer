@@ -8,9 +8,9 @@ namespace CloudantDotNet.Services
 {
     public interface ICekilisCloudantService
     {
-        Task<dynamic> CreateAsync(Cekilis item);
+        Task<Cekilis> CreateAsync(Cekilis item);
         Task<dynamic> DeleteAsync(Cekilis item);
-        Task<dynamic> GetAsync();
+        Task<Cekilis> GetAsync();
         Task PopulateTestData();
         Task<string> UpdateAsync(Coupon item);
     }

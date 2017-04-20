@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using CloudantDotNet.Services;
 using CloudantDotNet.Models;
 
-namespace dotnetCloudantWebstarter.Controllers
+namespace CloudantDotNet.Controllers
 {
     [Route("api/[controller]")]
     public class CouponController : Controller

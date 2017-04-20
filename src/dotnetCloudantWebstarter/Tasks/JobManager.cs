@@ -8,19 +8,45 @@ using CloudantDotNet.Services;
 
 namespace CloudantDotNet.Tasks
 {
-    public class JobManager
+    public class JobManager : IJobManager
     {
-        List<IJob> jobs;
+        private List<IJob> jobs;
 
-        public JobManager(ICekilisCloudantService cloudantService, ICouponsCloudantService couponsService, IMilliPiyangoService mpService)
+        ICekilisCloudantService _cloudantService;
+        ICouponsCloudantService _couponsService;
+        IMilliPiyangoService _mpService;
+        IUserCloudantService _userService;
+        IPushService _pushService;
+
+        public JobManager(ICekilisCloudantService cloudantService, ICouponsCloudantService couponsService, IMilliPiyangoService mpService, IUserCloudantService userService, IPushService pushService)
         {
+            _cloudantService = cloudantService;
+            _mpService = mpService;
+            _couponsService = couponsService;
+            _userService = userService;
+            _pushService = pushService;
 
             jobs = new List<IJob>();
 
-            CekilisJob cekilisJob = new CekilisJob(cloudantService, mpService);
-            jobs.Add(cekilisJob);
+            CekilisJob cekilisJob = new CekilisJob(_cloudantService, _mpService);
+            cekilisJob.onYeniCekilis += YeniCekilisInvoked;
+            AddJob(cekilisJob);
 
             CallJobsRepeatedly(TimeSpan.FromSeconds(60));
+        }
+
+        private void YeniCekilisInvoked(object sender, CekilisEventArgs e)
+        {
+            CekilisPushJob cekilisPushJob = new CekilisPushJob(_cloudantService, _userService, _pushService);
+            PushCekilisEventArgs args = new PushCekilisEventArgs();
+            args.job = cekilisPushJob;
+            cekilisPushJob.onCekilisPushFinished += CekilisPushFinishedInvoked;
+            AddJob(cekilisPushJob);
+        }
+
+        private void CekilisPushFinishedInvoked(object sender, PushCekilisEventArgs e)
+        {
+            RemoveJob(e.job);
         }
 
         private void CallJobsRepeatedly(TimeSpan interval)
@@ -29,8 +55,8 @@ namespace CloudantDotNet.Tasks
             {
                 while (true)
                 {
-                    await Task.Delay(interval);
                     StartJobs();
+                    await Task.Delay(interval);
                 }
             });
         }
@@ -74,6 +100,16 @@ namespace CloudantDotNet.Tasks
         private static bool DayOk(IJob job)
         {
             return job.workDay.Contains(DateTime.Now.GetTurkeyTime().DayOfWeek);
+        }
+
+        public void AddJob(IJob job)
+        {
+            jobs.Add(job);
+        }
+
+        public void RemoveJob(IJob job)
+        {
+            jobs.Remove(job);
         }
     }
 }

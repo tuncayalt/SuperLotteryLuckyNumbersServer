@@ -23,7 +23,7 @@ namespace CloudantDotNet.Services
             _urlEncoder = urlEncoder;
         }
 
-        public async Task<dynamic> CreateAsync(Cekilis item)
+        public async Task<Cekilis> CreateAsync(Cekilis item)
         {
             using (var client = CloudantClient())
             {
@@ -31,19 +31,19 @@ namespace CloudantDotNet.Services
                 if (response.IsSuccessStatusCode)
                 {
                     var responseJson = await response.RequestMessage.Content.ReadAsAsync<Cekilis>();
-                    return JsonConvert.SerializeObject(
-                        new
-                        {
-                            tarih = responseJson.tarih
-                        ,
-                            tarih_view = responseJson.tarih_view
-                        ,
-                            numbers = responseJson.numbers
-                        });
+
+                    return new Cekilis()
+                    {
+                        tarih = responseJson.tarih
+                       ,
+                        tarih_view = responseJson.tarih_view
+                       ,
+                        numbers = responseJson.numbers
+                    };
                 }
                 string msg = "Failure to POST. Status Code: " + response.StatusCode + ". Reason: " + response.ReasonPhrase;
                 Console.WriteLine(msg);
-                return JsonConvert.SerializeObject(new { msg = "Failure to POST. Status Code: " + response.StatusCode + ". Reason: " + response.ReasonPhrase });
+                return null;
             }
         }
 
@@ -52,7 +52,7 @@ namespace CloudantDotNet.Services
             throw new NotImplementedException();
         }
 
-        public async Task<dynamic> GetAsync()
+        public async Task<Cekilis> GetAsync()
         {
             CekilisSelector cekSelector = new CekilisSelector();
             cekSelector.selector = new CekilisSelector.Selector();
@@ -91,7 +91,7 @@ namespace CloudantDotNet.Services
                 }
                 string msg = "Failure to GET. Status Code: " + response.StatusCode + ". Reason: " + response.ReasonPhrase;
                 Console.WriteLine(msg);
-                return JsonConvert.SerializeObject(new { msg = msg });
+                return null;
             }
         }
 

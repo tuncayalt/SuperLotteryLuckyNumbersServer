@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using CloudantDotNet.Models;
-using Newtonsoft.Json;
-using System.Net;
 using CloudantDotNet.Services;
 
 // For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
-namespace dotnetCloudantWebstarter.Controllers
+namespace CloudantDotNet.Controllers
 {
     [Route("api/[controller]")]
     public class CekilisController : Controller

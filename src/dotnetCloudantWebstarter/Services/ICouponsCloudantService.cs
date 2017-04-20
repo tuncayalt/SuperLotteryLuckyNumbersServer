@@ -9,6 +9,8 @@ namespace CloudantDotNet.Services
         Task<dynamic> CreateListAsync(CouponList items);
         Task<dynamic> DeleteAsync(Coupon item);
         Task<dynamic> GetAllAsync();
+        Task<dynamic> GetAllByUserName(string userName);
+        Task<dynamic> GetAllByTarih(string tarih);
         Task PopulateTestData();
         Task<string> UpdateAsync(Coupon item);
     }
