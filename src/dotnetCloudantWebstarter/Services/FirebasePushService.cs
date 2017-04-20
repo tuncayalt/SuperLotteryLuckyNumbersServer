@@ -18,10 +18,12 @@ namespace CloudantDotNet.Services
             using (var client = FirebaseClient())
             {
 
-                var response = await client.PostAsJsonAsync("/", push);
+                var response = await client.PostAsJsonAsync("", push);
 
                 if (response.IsSuccessStatusCode)
                 {
+                    string result = response.Content.ReadAsStringAsync().Result;
+
                     return true;
                 }
 

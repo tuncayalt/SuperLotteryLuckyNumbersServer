@@ -13,8 +13,8 @@ namespace CloudantDotNet.Models
 
         public class Data
         {
-            public string numbers { get; set; }
-            public string tarihView { get; set; }
+            public string score { get; set; }
+            public string time { get; set; }
         }
 
         public class Notification
@@ -27,8 +27,8 @@ namespace CloudantDotNet.Models
         {
             PushNotificationCekilis push = new PushNotificationCekilis();
             push.data = new Data();
-            push.data.numbers = numbers;
-            push.data.tarihView = tarihView;
+            push.data.score = numbers;
+            push.data.time = tarihView;
             push.notification = new Notification();
             push.notification.title = "Super Loto cekildi";
             push.notification.body = tarihView + " tarihi cekilis sonucu: " + numbers;
