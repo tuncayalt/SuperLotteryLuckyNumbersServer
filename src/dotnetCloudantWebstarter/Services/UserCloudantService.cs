@@ -25,9 +25,29 @@ namespace CloudantDotNet.Services
             _urlEncoder = urlEncoder;
         }
 
-        public Task<dynamic> CreateAsync(User item)
+        public async Task<bool> CreateAsync(User userInput)
         {
-            throw new NotImplementedException();
+            if (userInput == null)
+                return false;
+
+            UserDbDto user = new UserDbDto()
+            {
+                push_cekilis = userInput.push_cekilis,
+                push_win = userInput.push_win,
+                token = userInput.token,
+                user_mail = userInput.user_mail
+            };
+            using (var client = CloudantClient())
+            {
+                var response = await client.PostAsJsonAsync(_dbName, user);
+                if (response.IsSuccessStatusCode)
+                {
+                    return true;
+                }
+                string msg = "Failure to POST. Status Code: " + response.StatusCode + ". Reason: " + response.ReasonPhrase;
+                Console.WriteLine(msg);
+                return false;
+            }
         }
 
         public Task<dynamic> DeleteAsync(User item)
@@ -60,8 +80,8 @@ namespace CloudantDotNet.Services
                                 _rev = (string)item["_rev"],
                                 token = (string)item["token"],
                                 user_mail = (string)item["user_mail"],
-                                push_cekilis = (bool)item["push_cekilis"],
-                                push_win = (bool)item["push_win"],
+                                push_cekilis = (string)item["push_cekilis"],
+                                push_win = (string)item["push_win"],
                             };
                             userList.Add(user);
                         }
@@ -100,8 +120,8 @@ namespace CloudantDotNet.Services
                                 _rev = (string)item["_rev"],
                                 token = (string)item["token"],
                                 user_mail = (string)item["user_mail"],
-                                push_cekilis = (bool)item["push_cekilis"],
-                                push_win = (bool)item["push_win"],
+                                push_cekilis = (string)item["push_cekilis"],
+                                push_win = (string)item["push_win"],
                             };
                             userList.Add(user);
                         }
@@ -113,38 +133,57 @@ namespace CloudantDotNet.Services
             }
         }
 
-        public Task<dynamic> GetUserAsync(string userMail)
+        public async Task<dynamic> GetUserAsync(string userMail)
         {
-            throw new NotImplementedException();
+            UserMailSelector userSelector = UserMailSelector.Build(userMail);
+
+            using (var client = CloudantClient())
+            {
+                List<User> userList = null;
+                var response = await client.PostAsJsonAsync(_dbName + "/_find", userSelector);
+                if (response.IsSuccessStatusCode)
+                {
+                    string userJson = await response.Content.ReadAsStringAsync();
+                    JToken ob = JObject.Parse(userJson);
+                    JArray arr = (JArray)ob.SelectToken("docs");
+                    User user = null;
+                    if (arr != null && arr.Any())
+                    {
+                        userList = new List<User>();
+                        foreach (var item in arr)
+                        {
+                            user = new User()
+                            {
+                                _id = (string)item["_id"],
+                                _rev = (string)item["_rev"],
+                                token = (string)item["token"],
+                                user_mail = (string)item["user_mail"],
+                                push_cekilis = (string)item["push_cekilis"],
+                                push_win = (string)item["push_win"],
+                            };
+                            userList.Add(user);
+                        }
+                    }
+                }
+                string msg = "Failure to GET. Status Code: " + response.StatusCode + ". Reason: " + response.ReasonPhrase;
+                Console.WriteLine(msg);
+                return userList;
+            }
         }
 
-        public async Task<string> UpdateAsync(User item)
+        public async Task<bool> UpdateAsync(User item)
         {
             using (var client = CloudantClient())
             {
-                var response = await client.PutAsJsonAsync(_dbName + "/" + _urlEncoder.Encode(item._id.ToString()), item);
+                //var response = await client.PutAsJsonAsync(_dbName + "/" + _urlEncoder.Encode(item._id.ToString()), item);
+                var response = await client.PutAsJsonAsync(_dbName + "/" + _urlEncoder.Encode(item.ToString()), item);
                 if (response.IsSuccessStatusCode)
                 {
-                    var responseJson = await response.Content.ReadAsAsync<User>();
-                    return JsonConvert.SerializeObject(
-                        new
-                        {
-                            _id = responseJson._id
-                        ,
-                            _rev = responseJson._rev
-                        ,
-                            user_mail = responseJson.user_mail
-                        ,
-                            token = responseJson.token
-                        ,
-                            push_cekilis = responseJson.push_cekilis
-                        ,
-                            push_win = responseJson.push_win
-                        });
+                    return true;
                 }
                 string msg = "Failure to PUT. Status Code: " + response.StatusCode + ". Reason: " + response.ReasonPhrase;
                 Console.WriteLine(msg);
-                return JsonConvert.SerializeObject(new { msg = msg });
+                return false;
             }
         }
 

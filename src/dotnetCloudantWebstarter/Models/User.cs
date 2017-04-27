@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Runtime.Serialization;
 
 namespace CloudantDotNet.Models
 {
@@ -11,7 +8,14 @@ namespace CloudantDotNet.Models
         public string _rev { get; set; }
         public string user_mail { get; set; }
         public string token { get; set; }
-        public bool push_cekilis { get; set; }
-        public bool push_win { get; set; }
+        public string push_cekilis { get; set; }
+        public string push_win { get; set; }
+    }
+    public class UserDbDto
+    {
+        public string user_mail { get; set; }
+        public string token { get; set; }
+        public string push_cekilis { get; set; }
+        public string push_win { get; set; }
     }
 }

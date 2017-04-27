@@ -8,11 +8,11 @@ namespace CloudantDotNet.Services
 {
     public interface IUserCloudantService
     {
-        Task<dynamic> CreateAsync(User item);
+        Task<bool> CreateAsync(User item);
         Task<dynamic> DeleteAsync(User item);
         Task<dynamic> GetTokenAsync(string token);
         Task<dynamic> GetUserAsync(string userMail);
         Task<List<User>> GetPushCekilis();
-        Task<string> UpdateAsync(User item);
+        Task<bool> UpdateAsync(User item);
     }
 }
