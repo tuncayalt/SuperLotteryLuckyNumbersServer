@@ -176,7 +176,7 @@ namespace CloudantDotNet.Services
             using (var client = CloudantClient())
             {
                 //var response = await client.PutAsJsonAsync(_dbName + "/" + _urlEncoder.Encode(item._id.ToString()), item);
-                var response = await client.PutAsJsonAsync(_dbName + "/" + _urlEncoder.Encode(item.ToString()), item);
+                var response = await client.PutAsJsonAsync(_dbName + "/" + _urlEncoder.Encode(item._id.ToString()), item);
                 if (response.IsSuccessStatusCode)
                 {
                     return true;
