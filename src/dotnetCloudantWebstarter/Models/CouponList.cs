@@ -7,6 +7,6 @@ namespace CloudantDotNet.Models
 {
     public class CouponList
     {
-        public Coupon[] Coupons { get; set; }
+        public List<Coupon> docs { get; set; }
     }
 }

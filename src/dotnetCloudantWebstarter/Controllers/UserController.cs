@@ -60,7 +60,8 @@ namespace CloudantDotNet.Controllers
                         user_mail = user_mail,
                         token = recent_token,
                         push_cekilis = "T",
-                        push_win = "T"
+                        push_win = "T",
+                        time = DateTime.Now.ToString()
                     };
                     return await _cloudantService.CreateAsync(user);
                 }
@@ -92,12 +93,12 @@ namespace CloudantDotNet.Controllers
                 List<User> userList = await _cloudantService.GetUserAsync(user_mail);
                 if (userList != null && userList.Any())
                 {
-                    foreach (var item in userList)
+                    foreach (var user in userList)
                     {
-                        if (!item.token.Equals(recent_token))
+                        if (!user.token.Equals(recent_token))
                         {
-                            item.token = recent_token;
-                            await _cloudantService.UpdateAsync(item);
+                            user.token = recent_token;
+                            await _cloudantService.UpdateAsync(user);
                         }
                     }
                     return true;
@@ -109,7 +110,8 @@ namespace CloudantDotNet.Controllers
                         user_mail = user_mail,
                         token = recent_token,
                         push_cekilis = "T",
-                        push_win = "T"
+                        push_win = "T",
+                        time = DateTime.Now.ToString()
                     };
                     return await _cloudantService.CreateAsync(user);
                 }

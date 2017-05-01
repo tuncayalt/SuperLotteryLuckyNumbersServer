@@ -33,9 +33,11 @@ namespace CloudantDotNet.Controllers
 
         // POST api/Coupon
         [HttpPost]
-        public async Task<dynamic> Post([FromBody]Coupon item)
+        public async Task<dynamic> Post([FromBody]Coupon[] items)
         {
-            return await _cloudantService.CreateAsync(item);
+            CouponList list = new CouponList();
+            list.docs = items.ToList();
+            return await _cloudantService.CreateListAsync(list);
         }
 
         // PUT api/Coupon/5

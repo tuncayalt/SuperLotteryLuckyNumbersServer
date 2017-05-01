@@ -18,7 +18,7 @@ namespace CloudantDotNet.Models
         public static UserTokenSelector Build(string token)
         {
             UserTokenSelector userSelector = new UserTokenSelector();
-            userSelector.selector = new UserTokenSelector.Selector();
+            userSelector.selector = new Selector();
             userSelector.selector.token = token;
             userSelector.fields = new List<string>();
             userSelector.fields.Add("_id");
@@ -27,6 +27,7 @@ namespace CloudantDotNet.Models
             userSelector.fields.Add("user_mail");
             userSelector.fields.Add("push_win");
             userSelector.fields.Add("push_cekilis");
+            userSelector.fields.Add("time");
             return userSelector;
         }
     }

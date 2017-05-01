@@ -35,7 +35,8 @@ namespace CloudantDotNet.Services
                 push_cekilis = userInput.push_cekilis,
                 push_win = userInput.push_win,
                 token = userInput.token,
-                user_mail = userInput.user_mail
+                user_mail = userInput.user_mail,
+                time = DateTime.Now.ToString()
             };
             using (var client = CloudantClient())
             {
@@ -82,6 +83,7 @@ namespace CloudantDotNet.Services
                                 user_mail = (string)item["user_mail"],
                                 push_cekilis = (string)item["push_cekilis"],
                                 push_win = (string)item["push_win"],
+                                time = (string)item["time"]
                             };
                             userList.Add(user);
                         }
@@ -122,6 +124,7 @@ namespace CloudantDotNet.Services
                                 user_mail = (string)item["user_mail"],
                                 push_cekilis = (string)item["push_cekilis"],
                                 push_win = (string)item["push_win"],
+                                time = (string)item["time"]
                             };
                             userList.Add(user);
                         }
@@ -160,6 +163,7 @@ namespace CloudantDotNet.Services
                                 user_mail = (string)item["user_mail"],
                                 push_cekilis = (string)item["push_cekilis"],
                                 push_win = (string)item["push_win"],
+                                time = (string)item["time"]
                             };
                             userList.Add(user);
                         }

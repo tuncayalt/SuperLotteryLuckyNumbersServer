@@ -10,7 +10,7 @@ namespace CloudantDotNet.Tasks
     public class CekilisJob : IJob
     {
         public DayOfWeek[] workDay { get; set; } = { DayOfWeek.Thursday };
-        public int startHour { get; set; } = 17;
+        public int startHour { get; set; } = 18;
         public int startMin { get; set; } = 0;
         public int endHour { get; set; } = 23;
         public int endMin { get; set; } = 59;

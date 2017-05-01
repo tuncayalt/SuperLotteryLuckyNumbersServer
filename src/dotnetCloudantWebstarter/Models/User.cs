@@ -10,6 +10,7 @@ namespace CloudantDotNet.Models
         public string token { get; set; }
         public string push_cekilis { get; set; }
         public string push_win { get; set; }
+        public string time { get; set; }
     }
     public class UserDbDto
     {
@@ -17,5 +18,6 @@ namespace CloudantDotNet.Models
         public string token { get; set; }
         public string push_cekilis { get; set; }
         public string push_win { get; set; }
+        public string time { get; set; }
     }
 }

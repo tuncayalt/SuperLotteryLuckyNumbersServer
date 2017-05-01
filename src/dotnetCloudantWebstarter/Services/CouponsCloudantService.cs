@@ -1,6 +1,7 @@
 using CloudantDotNet.Models;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -11,7 +12,7 @@ namespace CloudantDotNet.Services
 {
     public class CouponsCloudantService : ICouponsCloudantService
     {
-        private static readonly string _dbName = "coupons";
+        private static readonly string _dbName = "coupon";
         private readonly Creds _cloudantCreds;
         private readonly UrlEncoder _urlEncoder;
 
@@ -59,14 +60,14 @@ namespace CloudantDotNet.Services
         {
             using (var client = CloudantClient())
             {
-                var response = await client.DeleteAsync(_dbName + "/" + _urlEncoder.Encode(item.CouponId.ToString()));
+                var response = await client.DeleteAsync(_dbName + "/" + _urlEncoder.Encode(item.id.ToString()));
                 if (response.IsSuccessStatusCode)
                 {
                     var responseJson = await response.Content.ReadAsAsync<Coupon>();
                     return JsonConvert.SerializeObject(
                         new
                         {
-                            CouponId = responseJson.CouponId
+                            id = responseJson.id
                         ,
                             User = responseJson.User
                         ,
@@ -110,14 +111,14 @@ namespace CloudantDotNet.Services
         {
             using (var client = CloudantClient())
             {
-                var response = await client.PutAsJsonAsync(_dbName + "/" + _urlEncoder.Encode(item.CouponId.ToString()), item);
+                var response = await client.PutAsJsonAsync(_dbName + "/" + _urlEncoder.Encode(item.id.ToString()), item);
                 if (response.IsSuccessStatusCode)
                 {
                     var responseJson = await response.Content.ReadAsAsync<Coupon>();
                     return JsonConvert.SerializeObject(
                         new
                         {
-                            CouponId = responseJson.CouponId
+                            id = responseJson.id
                         ,
                             User = responseJson.User
                         ,
@@ -187,11 +188,11 @@ namespace CloudantDotNet.Services
         {
             using (var client = CloudantClient())
             {
-                var response = await client.PostAsJsonAsync(_dbName, items.Coupons);
+                var response = await client.PostAsJsonAsync(_dbName + "/_bulk_docs", items);
                 if (response.IsSuccessStatusCode)
                 {
-                    var responseJson = await response.Content.ReadAsAsync<Coupon>();
-                    return "Coupons inserted";
+                    var responseJson = await response.Content.ReadAsAsync<List<Coupon>>();
+                    return responseJson;
                 }
                 string msg = "Failure to POST. Status Code: " + response.StatusCode + ". Reason: " + response.ReasonPhrase;
                 Console.WriteLine(msg);

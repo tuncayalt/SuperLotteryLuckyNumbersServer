@@ -27,6 +27,7 @@ namespace CloudantDotNet.Models
             userSelector.fields.Add("user_mail");
             userSelector.fields.Add("push_win");
             userSelector.fields.Add("push_cekilis");
+            userSelector.fields.Add("time");
             return userSelector;
         }
     }
