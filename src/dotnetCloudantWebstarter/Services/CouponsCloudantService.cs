@@ -209,7 +209,9 @@ namespace CloudantDotNet.Services
                 var response = await client.PostAsJsonAsync(_dbName + "/_find", couponSelector);
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadAsStringAsync();
+                    var responseJson = await response.Content.ReadAsStringAsync();
+                    CouponList couponList = JsonConvert.DeserializeObject<CouponList>(responseJson);
+                    return couponList.docs;  
                 }
                 string msg = "Failure to GET. Status Code: " + response.StatusCode + ". Reason: " + response.ReasonPhrase;
                 Console.WriteLine(msg);
