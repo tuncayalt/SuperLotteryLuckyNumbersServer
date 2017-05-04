@@ -1,4 +1,5 @@
 using CloudantDotNet.Models;
+using dotnetCloudantWebstarter.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -200,23 +201,20 @@ namespace CloudantDotNet.Services
             }
         }
 
-        public Task<dynamic> GetAllByUserName(string userName)
+        public async Task<dynamic> GetAllByUserName(string userName)
         {
-            //CekilisSelector cekSelector = new CekilisSelector();
-            //cekSelector.selector = new CekilisSelector.Selector();
-            //cekSelector.selector.tarih = new CekilisSelector.tarih();
-            //cekSelector.selector.tarih.gt = 0;
-            //cekSelector.fields = new List<string>();
-            //cekSelector.fields.Add("tarih");
-            //cekSelector.fields.Add("tarih_view");
-            //cekSelector.fields.Add("numbers");
-            //cekSelector.limit = 1;
-            //cekSelector.sort = new List<CekilisSelector.Sort>();
-            //cekSelector.sort.Add(new CekilisSelector.Sort()
-            //{
-            //    tarih = "desc"
-            //});
-            throw new NotImplementedException();
+            CouponSelector couponSelector = CouponSelector.Build(userName);
+            using (var client = CloudantClient())
+            {
+                var response = await client.PostAsJsonAsync(_dbName + "/_find", couponSelector);
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadAsStringAsync();
+                }
+                string msg = "Failure to GET. Status Code: " + response.StatusCode + ". Reason: " + response.ReasonPhrase;
+                Console.WriteLine(msg);
+                return new List<Coupon>();
+            }
         }
 
         public Task<dynamic> GetAllByTarih(string tarih)

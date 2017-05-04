@@ -25,10 +25,10 @@ namespace CloudantDotNet.Controllers
         }
 
         // GET api/Coupon/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        [HttpGet("{user}")]
+        public async Task<dynamic> Get(string user)
         {
-            return "value";
+            return await _cloudantService.GetAllByUserName(user);
         }
 
         // POST api/Coupon
