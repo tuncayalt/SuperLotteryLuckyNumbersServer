@@ -36,7 +36,7 @@ namespace CloudantDotNet.Controllers
         [HttpDelete]
         public async Task<dynamic> Delete(Coupon item)
         {
-            return await _cloudantService.DeleteAsync(item);
+            return await _cloudantService.DeleteAsync(item.CouponId);
         }
     }
 }

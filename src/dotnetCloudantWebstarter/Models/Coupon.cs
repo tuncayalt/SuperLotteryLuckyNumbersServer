@@ -20,17 +20,17 @@ namespace CloudantDotNet.Models
         public int WinCount { get; set; }
     }
 
-    //public class CouponDto
-    //{
-    //    public string _id { get; set; }
-    //    public string id { get; set; }
-    //    public string User { get; set; }
-    //    public string GameType { get; set; }
-    //    public string Numbers { get; set; }
-    //    public string PlayTime { get; set; }
-    //    public string LotteryTime { get; set; }
-    //    public string ToRemind { get; set; }
-    //    public string ServerCalled { get; set; }
-    //    public int WinCount { get; set; }
-    //}
+    public class CouponDto
+    {
+        public string _id { get; set; }
+        public string _rev { get; set; }
+        public string User { get; set; }
+        public string GameType { get; set; }
+        public string Numbers { get; set; }
+        public string PlayTime { get; set; }
+        public string LotteryTime { get; set; }
+        public string ToRemind { get; set; }
+        public string ServerCalled { get; set; }
+        public int WinCount { get; set; }
+    }
 }

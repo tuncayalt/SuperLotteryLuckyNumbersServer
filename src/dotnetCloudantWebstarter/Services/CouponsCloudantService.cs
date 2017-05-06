@@ -57,39 +57,34 @@ namespace CloudantDotNet.Services
             }
         }
 
-        public async Task<dynamic> DeleteAsync(Coupon item)
+        public async Task<dynamic> DeleteAsync(string couponId)
         {
+            CouponSelectorForId couponSelector = CouponSelectorForId.Build(couponId);
             using (var client = CloudantClient())
             {
-                var response = await client.DeleteAsync(_dbName + "/" + _urlEncoder.Encode(item.id.ToString()));
+                CouponDto item = null;
+                var response = await client.PostAsJsonAsync(_dbName + "/_find", couponSelector);
                 if (response.IsSuccessStatusCode)
                 {
-                    var responseJson = await response.Content.ReadAsAsync<Coupon>();
-                    return JsonConvert.SerializeObject(
-                        new
-                        {
-                            id = responseJson.id
-                        ,
-                            User = responseJson.User
-                        ,
-                            GameType = responseJson.GameType
-                        ,
-                            Numbers = responseJson.Numbers
-                        ,
-                            PlayTime = responseJson.PlayTime
-                        ,
-                            LotteryTime = responseJson.LotteryTime
-                        ,
-                            ToRemind = responseJson.ToRemind
-                        ,
-                            ServerCalled = responseJson.ServerCalled
-                        ,
-                            WinCount = responseJson.WinCount
-                        });
+
+                    var responseJson = await response.Content.ReadAsStringAsync();
+                    CouponListDto couponList = JsonConvert.DeserializeObject<CouponListDto>(responseJson);
+                    if (couponList != null && couponList.docs != null && couponList.docs.Count > 0)
+                        item = couponList.docs[0];
                 }
-                string msg = "Failure to DELETE. Status Code: " + response.StatusCode + ". Reason: " + response.ReasonPhrase;
-                Console.WriteLine(msg);
-                return JsonConvert.SerializeObject(new { msg = msg });
+                if (item != null)
+                {
+                    response = await client.DeleteAsync(_dbName + "/" + _urlEncoder.Encode(item._id.ToString()) + "?rev=" + _urlEncoder.Encode(item._rev.ToString()));
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var responseJson = await response.Content.ReadAsAsync<Coupon>();
+                        return new HttpResponseMessage(System.Net.HttpStatusCode.OK);
+                    }
+                    string msg = "Failure to DELETE. Status Code: " + response.StatusCode + ". Reason: " + response.ReasonPhrase;
+                    Console.WriteLine(msg);
+                    
+                }
+                return new HttpResponseMessage(System.Net.HttpStatusCode.BadRequest); ;
             }
         }
 
@@ -107,6 +102,25 @@ namespace CloudantDotNet.Services
                 return JsonConvert.SerializeObject(new { msg = msg });
             }
         }
+
+        public async Task<dynamic> GetByCouponIdAsync(string couponId)
+        {
+            CouponSelectorForId couponSelector = CouponSelectorForId.Build(couponId);
+            using (var client = CloudantClient())
+            {
+                var response = await client.PostAsJsonAsync(_dbName + "/_find", couponSelector);
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseJson = await response.Content.ReadAsStringAsync();
+                    CouponList couponList = JsonConvert.DeserializeObject<CouponList>(responseJson);
+                    return couponList.docs[0];
+                }
+                string msg = "Failure to GET. Status Code: " + response.StatusCode + ". Reason: " + response.ReasonPhrase;
+                Console.WriteLine(msg);
+                return new Coupon();
+            }
+        }
+
 
         public async Task<string> UpdateAsync(Coupon item)
         {

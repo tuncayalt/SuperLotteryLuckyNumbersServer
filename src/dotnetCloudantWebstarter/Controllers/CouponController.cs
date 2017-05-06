@@ -47,9 +47,10 @@ namespace CloudantDotNet.Controllers
         }
 
         // DELETE api/Coupon/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        [HttpDelete("{couponId}")]
+        public async Task<bool> Delete(string couponId)
         {
+            return await _cloudantService.DeleteAsync(couponId);
         }
     }
 }
