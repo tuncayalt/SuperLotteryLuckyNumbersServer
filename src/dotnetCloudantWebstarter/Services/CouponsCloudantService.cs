@@ -77,14 +77,13 @@ namespace CloudantDotNet.Services
                     response = await client.DeleteAsync(_dbName + "/" + _urlEncoder.Encode(item._id.ToString()) + "?rev=" + _urlEncoder.Encode(item._rev.ToString()));
                     if (response.IsSuccessStatusCode)
                     {
-                        var responseJson = await response.Content.ReadAsAsync<Coupon>();
-                        return new HttpResponseMessage(System.Net.HttpStatusCode.OK);
+                        return true;
                     }
                     string msg = "Failure to DELETE. Status Code: " + response.StatusCode + ". Reason: " + response.ReasonPhrase;
                     Console.WriteLine(msg);
                     
                 }
-                return new HttpResponseMessage(System.Net.HttpStatusCode.BadRequest); ;
+                return false; ;
             }
         }
 
