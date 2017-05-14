@@ -221,7 +221,7 @@ namespace CloudantDotNet.Services
                 if (response.IsSuccessStatusCode)
                 {
                     //var responseJson = await response.Content.ReadAsAsync<List<Coupon>>();
-                    return new HttpResponseMessage(System.Net.HttpStatusCode.OK);
+                    return true;
                 }
                 string msg = "Failure to POST. Status Code: " + response.StatusCode + ". Reason: " + response.ReasonPhrase;
                 Console.WriteLine(msg);
