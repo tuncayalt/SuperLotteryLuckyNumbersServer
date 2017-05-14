@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
-namespace dotnetCloudantWebstarter.Models
+namespace CloudantDotNet.Models
 {
-    public class CouponSelector
+    public class CouponSelectorByUser
     {
         public Selector selector { get; set; }
         public List<string> fields { get; set; }
@@ -22,10 +18,10 @@ namespace dotnetCloudantWebstarter.Models
             public string LotteryTime { get; set; }
         }
 
-        public static CouponSelector Build(string userMail)
+        public static CouponSelectorByUser Build(string userMail)
         {
-            CouponSelector couponSelector = new CouponSelector();
-            couponSelector.selector = new CouponSelector.Selector();
+            CouponSelectorByUser couponSelector = new CouponSelectorByUser();
+            couponSelector.selector = new CouponSelectorByUser.Selector();
             couponSelector.selector.User = userMail;
             couponSelector.sort = new List<Sort>();
             Sort sort = new Sort();

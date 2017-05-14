@@ -1,5 +1,4 @@
 using CloudantDotNet.Models;
-using dotnetCloudantWebstarter.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -125,7 +124,7 @@ namespace CloudantDotNet.Services
         {
             using (var client = CloudantClient())
             {
-                var response = await client.PutAsJsonAsync(_dbName + "/" + _urlEncoder.Encode(item.id.ToString()), item);
+                var response = await client.PutAsJsonAsync(_dbName + "/" + _urlEncoder.Encode(item.id.ToString()) + "?rev=" + _urlEncoder.Encode(item.rev.ToString()), item);
                 if (response.IsSuccessStatusCode)
                 {
                     var responseJson = await response.Content.ReadAsAsync<Coupon>();
@@ -156,6 +155,22 @@ namespace CloudantDotNet.Services
                 return JsonConvert.SerializeObject(new { msg = msg });
             }
         }
+
+        public async Task<dynamic> UpdateBulkAsync(CouponListDto items)
+        {
+            using (var client = CloudantClient())
+            {
+                var response = await client.PostAsJsonAsync(_dbName + "/_bulk_docs", items);
+                if (response.IsSuccessStatusCode)
+                {
+                    return true;
+                }
+                string msg = "Failure to PUT. Status Code: " + response.StatusCode + ". Reason: " + response.ReasonPhrase;
+                Console.WriteLine(msg);
+                return false;
+            }
+        }
+
 
         public async Task PopulateTestData()
         {
@@ -205,8 +220,8 @@ namespace CloudantDotNet.Services
                 var response = await client.PostAsJsonAsync(_dbName + "/_bulk_docs", items);
                 if (response.IsSuccessStatusCode)
                 {
-                    var responseJson = await response.Content.ReadAsAsync<List<Coupon>>();
-                    return responseJson;
+                    //var responseJson = await response.Content.ReadAsAsync<List<Coupon>>();
+                    return new HttpResponseMessage(System.Net.HttpStatusCode.OK);
                 }
                 string msg = "Failure to POST. Status Code: " + response.StatusCode + ". Reason: " + response.ReasonPhrase;
                 Console.WriteLine(msg);
@@ -216,7 +231,7 @@ namespace CloudantDotNet.Services
 
         public async Task<dynamic> GetAllByUserName(string userName)
         {
-            CouponSelector couponSelector = CouponSelector.Build(userName);
+            CouponSelectorByUser couponSelector = CouponSelectorByUser.Build(userName);
             using (var client = CloudantClient())
             {
                 var response = await client.PostAsJsonAsync(_dbName + "/_find", couponSelector);
@@ -232,9 +247,42 @@ namespace CloudantDotNet.Services
             }
         }
 
-        public Task<dynamic> GetAllByTarih(string tarih)
+        public async Task<dynamic> GetAllByTarih(string tarih)
         {
-            throw new NotImplementedException();
+            string lotteryTime = tarih.Substring(0, 4) + "/" + tarih.Substring(4, 2) + "/" + tarih.Substring(6, 2);
+            CouponSelectorByTarih couponSelector = CouponSelectorByTarih.Build(lotteryTime);
+            using (var client = CloudantClient())
+            {
+                var response = await client.PostAsJsonAsync(_dbName + "/_find", couponSelector);
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseJson = await response.Content.ReadAsStringAsync();
+                    CouponListDto couponList = JsonConvert.DeserializeObject<CouponListDto>(responseJson);
+                    return couponList.docs;
+                }
+                string msg = "Failure to GET. Status Code: " + response.StatusCode + ". Reason: " + response.ReasonPhrase;
+                Console.WriteLine(msg);
+                return new List<CouponDto>();
+            }
+        }
+
+        public async Task<dynamic> GetAllByUserNameAndTarih(string userName, string tarih)
+        {
+            string lotteryTime = tarih.Substring(0, 4) + "/" + tarih.Substring(4, 2) + "/" + tarih.Substring(6, 2);
+            CouponSelectorForUserAndTarih couponSelector = CouponSelectorForUserAndTarih.Build(userName, lotteryTime);
+            using (var client = CloudantClient())
+            {
+                var response = await client.PostAsJsonAsync(_dbName + "/_find", couponSelector);
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseJson = await response.Content.ReadAsStringAsync();
+                    CouponList couponList = JsonConvert.DeserializeObject<CouponList>(responseJson);
+                    return couponList.docs;
+                }
+                string msg = "Failure to GET. Status Code: " + response.StatusCode + ". Reason: " + response.ReasonPhrase;
+                Console.WriteLine(msg);
+                return new List<Coupon>();
+            }
         }
     }
 

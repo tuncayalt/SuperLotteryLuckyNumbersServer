@@ -11,7 +11,9 @@ namespace CloudantDotNet.Services
         Task<dynamic> GetAllAsync();
         Task<dynamic> GetAllByUserName(string userName);
         Task<dynamic> GetAllByTarih(string tarih);
+        Task<dynamic> GetAllByUserNameAndTarih(string userName, string tarih);
         Task PopulateTestData();
         Task<string> UpdateAsync(Coupon item);
+        Task<dynamic> UpdateBulkAsync(CouponListDto items);
     }
 }

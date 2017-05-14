@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace CloudantDotNet.Models
+﻿namespace CloudantDotNet.Models
 {
     public class Coupon
     {
@@ -24,6 +19,7 @@ namespace CloudantDotNet.Models
     {
         public string _id { get; set; }
         public string _rev { get; set; }
+        public string CouponId { get; set; }
         public string User { get; set; }
         public string GameType { get; set; }
         public string Numbers { get; set; }

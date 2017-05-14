@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using CloudantDotNet.Models;
 using System.Net.Http;
@@ -13,7 +11,7 @@ namespace CloudantDotNet.Services
         string baseAddress = @"https://fcm.googleapis.com/fcm/send";
         string serverKey = "AAAAqgc7ehk:APA91bH8pJx31iSiI8JHY_sWNFO8zL-2d906p4gYNuXtAUTgD2d7juMQh3O2KkBA8yHdyu-YxtxmzXpT_yBy8elOWElVBWizHVpPM9BcQ-o99417Dss1LREP4N-qUs82YFivpDGSrI-Y";
 
-        public async Task<bool> SendPush(PushNotificationCekilis push)
+        public async Task<bool> SendPush(PushNotification push)
         {
             using (var client = FirebaseClient())
             {

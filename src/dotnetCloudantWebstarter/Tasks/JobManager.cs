@@ -1,9 +1,7 @@
-﻿using Microsoft.Extensions.Caching.Memory;
-using System;
+﻿using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 using CloudantDotNet.Services;
 
 namespace CloudantDotNet.Tasks
@@ -12,15 +10,15 @@ namespace CloudantDotNet.Tasks
     {
         private List<IJob> jobs;
 
-        ICekilisCloudantService _cloudantService;
+        ICekilisCloudantService _cekilisService;
         ICouponsCloudantService _couponsService;
         IMilliPiyangoService _mpService;
         IUserCloudantService _userService;
         IPushService _pushService;
 
-        public JobManager(ICekilisCloudantService cloudantService, ICouponsCloudantService couponsService, IMilliPiyangoService mpService, IUserCloudantService userService, IPushService pushService)
+        public JobManager(ICekilisCloudantService cekilisService, ICouponsCloudantService couponsService, IMilliPiyangoService mpService, IUserCloudantService userService, IPushService pushService)
         {
-            _cloudantService = cloudantService;
+            _cekilisService = cekilisService;
             _mpService = mpService;
             _couponsService = couponsService;
             _userService = userService;
@@ -28,7 +26,7 @@ namespace CloudantDotNet.Tasks
 
             jobs = new List<IJob>();
 
-            CekilisJob cekilisJob = new CekilisJob(_cloudantService, _mpService);
+            CekilisJob cekilisJob = new CekilisJob(_cekilisService, _mpService);
             cekilisJob.onYeniCekilis += YeniCekilisInvoked;
             AddJob(cekilisJob);
 
@@ -37,7 +35,22 @@ namespace CloudantDotNet.Tasks
 
         private void YeniCekilisInvoked(object sender, CekilisEventArgs e)
         {
-            CekilisPushJob cekilisPushJob = new CekilisPushJob(_cloudantService, _userService, _pushService);
+            AddCekilisPushJob();
+            AddCouponPushJob();
+        }
+
+        private void AddCouponPushJob()
+        {
+            CouponPushJob couponPushJob = new CouponPushJob(_cekilisService, _userService, _pushService, _couponsService);
+            PushCouponEventArgs args = new PushCouponEventArgs();
+            args.job = couponPushJob;
+            couponPushJob.onCouponPushFinished += CouponPushFinishedInvoked;
+            AddJob(couponPushJob);
+        }
+
+        private void AddCekilisPushJob()
+        {
+            CekilisPushJob cekilisPushJob = new CekilisPushJob(_cekilisService, _userService, _pushService);
             PushCekilisEventArgs args = new PushCekilisEventArgs();
             args.job = cekilisPushJob;
             cekilisPushJob.onCekilisPushFinished += CekilisPushFinishedInvoked;
@@ -45,6 +58,11 @@ namespace CloudantDotNet.Tasks
         }
 
         private void CekilisPushFinishedInvoked(object sender, PushCekilisEventArgs e)
+        {
+            RemoveJob(e.job);
+        }
+
+        private void CouponPushFinishedInvoked(object sender, PushCouponEventArgs e)
         {
             RemoveJob(e.job);
         }
