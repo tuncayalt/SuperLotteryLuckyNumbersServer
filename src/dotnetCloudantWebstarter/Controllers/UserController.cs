@@ -28,98 +28,98 @@ namespace CloudantDotNet.Controllers
         // PUT api/user
         [HttpPut]
         [Route("api/user/SaveToken")]
-        public async Task<dynamic> PutToken(string prev_token, string recent_token, string user_mail, string prev_user_mail)
+        public async Task<dynamic> PutToken([FromBody]UserRequestDto userReq)
         {
-            if (recent_token == null || string.IsNullOrWhiteSpace(recent_token))
+            if (userReq.recent_token == null || string.IsNullOrWhiteSpace(userReq.recent_token))
                 return null;
 
-            prev_token = (string.IsNullOrWhiteSpace(prev_token)) ? "" : prev_token;
-            recent_token = (string.IsNullOrWhiteSpace(recent_token)) ? "" : recent_token;
-            user_mail = (string.IsNullOrWhiteSpace(user_mail)) ? "" : user_mail;
-            prev_user_mail = (string.IsNullOrWhiteSpace(prev_user_mail)) ? "" : prev_user_mail;
+            userReq.prev_token = (string.IsNullOrWhiteSpace(userReq.prev_token)) ? "" : userReq.prev_token;
+            userReq.recent_token = (string.IsNullOrWhiteSpace(userReq.recent_token)) ? "" : userReq.recent_token;
+            userReq.user_mail = (string.IsNullOrWhiteSpace(userReq.user_mail)) ? "" : userReq.user_mail;
+            userReq.prev_user_mail = (string.IsNullOrWhiteSpace(userReq.prev_user_mail)) ? "" : userReq.prev_user_mail;
 
             try
             {
-                List<User> userList = await _cloudantService.GetTokenAsync(prev_token);
+                List<User> userList = await _cloudantService.GetTokenAsync(userReq.prev_token);
                 if (userList != null && userList.Any())
                 {
                     foreach (var item in userList)
                     {
-                        item.token = recent_token;
-                        if (!string.IsNullOrWhiteSpace(user_mail))
+                        item.token = userReq.recent_token;
+                        if (!string.IsNullOrWhiteSpace(userReq.user_mail))
                         {
-                            item.user_mail = user_mail;
+                            item.user_mail = userReq.user_mail;
                         }
-                        return await _cloudantService.UpdateAsync(item);
+                        await _cloudantService.UpdateAsync(item);
                     }
                 }
                 else
                 {
                     User user = new User()
                     {
-                        user_mail = user_mail,
-                        token = recent_token,
-                        push_cekilis = "T",
-                        push_win = "T",
+                        user_mail = userReq.user_mail,
+                        token = userReq.recent_token,
+                        push_cekilis = userReq.push_cekilis,
+                        push_win = userReq.push_win,
                         time = DateTime.Now.ToString()
                     };
-                    return await _cloudantService.CreateAsync(user);
+                    await _cloudantService.CreateAsync(user);
                 }
-                return userList;
+                return true;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                throw;
+                return false;
             }
         }
 
         [HttpPut]
         [Route("api/user/SaveUser")]
-        public async Task<dynamic> PutUser(string prev_token, string recent_token, string user_mail, string prev_user_mail)
+        public async Task<dynamic> PutUser([FromBody]UserRequestDto userReq)
         {
-            if (string.IsNullOrWhiteSpace(user_mail))
+            if (string.IsNullOrWhiteSpace(userReq.user_mail))
                 return null;
-            if (string.IsNullOrWhiteSpace(recent_token))
+            if (string.IsNullOrWhiteSpace(userReq.recent_token))
                 return null;
 
-            prev_token = (string.IsNullOrWhiteSpace(prev_token)) ? "" : prev_token;
-            recent_token = (string.IsNullOrWhiteSpace(recent_token)) ? "" : recent_token;
-            user_mail = (string.IsNullOrWhiteSpace(user_mail)) ? "" : user_mail;
-            prev_user_mail = (string.IsNullOrWhiteSpace(prev_user_mail)) ? "" : prev_user_mail;
+            userReq.prev_token = (string.IsNullOrWhiteSpace(userReq.prev_token)) ? "" : userReq.prev_token;
+            userReq.recent_token = (string.IsNullOrWhiteSpace(userReq.recent_token)) ? "" : userReq.recent_token;
+            userReq.user_mail = (string.IsNullOrWhiteSpace(userReq.user_mail)) ? "" : userReq.user_mail;
+            userReq.prev_user_mail = (string.IsNullOrWhiteSpace(userReq.prev_user_mail)) ? "" : userReq.prev_user_mail;
 
             try
             {
-                List<User> userList = await _cloudantService.GetUserAsync(user_mail);
+                List<User> userList = await _cloudantService.GetUserAsync(userReq.user_mail);
                 if (userList != null && userList.Any())
                 {
                     foreach (var user in userList)
                     {
-                        if (!user.token.Equals(recent_token))
+                        if (!user.token.Equals(userReq.recent_token))
                         {
-                            user.token = recent_token;
+                            user.token = userReq.recent_token;
                             await _cloudantService.UpdateAsync(user);
                         }
                     }
-                    return true;
                 }
                 else
                 {
                     User user = new User()
                     {
-                        user_mail = user_mail,
-                        token = recent_token,
-                        push_cekilis = "T",
-                        push_win = "T",
+                        user_mail = userReq.user_mail,
+                        token = userReq.recent_token,
+                        push_cekilis = userReq.push_cekilis,
+                        push_win = userReq.push_win,
                         time = DateTime.Now.ToString()
                     };
-                    return await _cloudantService.CreateAsync(user);
+                    await _cloudantService.CreateAsync(user);
                 }
+                return true;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                throw;
+                return false;
             }
         }
     }

@@ -20,4 +20,14 @@ namespace CloudantDotNet.Models
         public string push_win { get; set; }
         public string time { get; set; }
     }
+
+    public class UserRequestDto
+    {
+        public string prev_token { get; set; }
+        public string recent_token { get; set; }
+        public string user_mail { get; set; }
+        public string prev_user_mail { get; set; }
+        public string push_cekilis { get; set; }
+        public string push_win { get; set; }
+    }
 }
