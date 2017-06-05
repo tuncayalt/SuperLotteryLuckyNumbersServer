@@ -59,7 +59,7 @@ namespace CloudantDotNet.Tasks
 
             foreach (var user in userList)
             {
-                List<CouponDto> userCouponList = couponList.Where(c => c.User.Equals(user.user_mail)).ToList();
+                List<CouponDto> userCouponList = couponList.Where(c => c.User.Equals(user.user_id)).ToList();
                 if (userCouponList == null || !userCouponList.Any())
                 {
                     continue;

@@ -34,7 +34,7 @@ namespace CloudantDotNet.Services
                 push_cekilis = userInput.push_cekilis,
                 push_win = userInput.push_win,
                 token = userInput.token,
-                user_mail = userInput.user_mail,
+                user_id = userInput.user_id,
                 time = DateTime.Now.ToString()
             };
             using (var client = CloudantClient())
@@ -79,7 +79,7 @@ namespace CloudantDotNet.Services
                                 _id = (string)item["_id"],
                                 _rev = (string)item["_rev"],
                                 token = (string)item["token"],
-                                user_mail = (string)item["user_mail"],
+                                user_id = (string)item["user_id"],
                                 push_cekilis = (string)item["push_cekilis"],
                                 push_win = (string)item["push_win"],
                                 time = (string)item["time"]
@@ -120,7 +120,7 @@ namespace CloudantDotNet.Services
                                 _id = (string)item["_id"],
                                 _rev = (string)item["_rev"],
                                 token = (string)item["token"],
-                                user_mail = (string)item["user_mail"],
+                                user_id = (string)item["user_id"],
                                 push_cekilis = (string)item["push_cekilis"],
                                 push_win = (string)item["push_win"],
                                 time = (string)item["time"]
@@ -137,7 +137,7 @@ namespace CloudantDotNet.Services
 
         public async Task<dynamic> GetUserAsync(string userMail)
         {
-            UserMailSelector userSelector = UserMailSelector.Build(userMail);
+            UserIdSelector userSelector = UserIdSelector.Build(userMail);
 
             using (var client = CloudantClient())
             {
@@ -159,7 +159,7 @@ namespace CloudantDotNet.Services
                                 _id = (string)item["_id"],
                                 _rev = (string)item["_rev"],
                                 token = (string)item["token"],
-                                user_mail = (string)item["user_mail"],
+                                user_id = (string)item["user_id"],
                                 push_cekilis = (string)item["push_cekilis"],
                                 push_win = (string)item["push_win"],
                                 time = (string)item["time"]

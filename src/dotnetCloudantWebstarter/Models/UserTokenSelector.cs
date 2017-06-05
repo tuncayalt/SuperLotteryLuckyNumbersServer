@@ -21,7 +21,7 @@ namespace CloudantDotNet.Models
             userSelector.fields.Add("_id");
             userSelector.fields.Add("_rev");
             userSelector.fields.Add("token");
-            userSelector.fields.Add("user_mail");
+            userSelector.fields.Add("user_id");
             userSelector.fields.Add("push_win");
             userSelector.fields.Add("push_cekilis");
             userSelector.fields.Add("time");

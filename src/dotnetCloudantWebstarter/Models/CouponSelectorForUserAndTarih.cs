@@ -14,11 +14,11 @@ namespace CloudantDotNet.Models
             public int WinCount { get; set; }
         }
 
-        public static CouponSelectorForUserAndTarih Build(string userMail, string lotteryTime)
+        public static CouponSelectorForUserAndTarih Build(string userId, string lotteryTime)
         {
             CouponSelectorForUserAndTarih couponSelector = new CouponSelectorForUserAndTarih();
             couponSelector.selector = new Selector();
-            couponSelector.selector.User = userMail;
+            couponSelector.selector.User = userId;
             couponSelector.selector.LotteryTime = lotteryTime;
             couponSelector.selector.WinCount = -1;
             couponSelector.fields = new List<string>();

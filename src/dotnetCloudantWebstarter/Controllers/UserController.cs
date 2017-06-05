@@ -20,9 +20,9 @@ namespace CloudantDotNet.Controllers
         // GET: api/values
         [HttpGet]
         [Route("api/user")]
-        public async Task<dynamic> Get(string userMail)
+        public async Task<dynamic> Get(string userId)
         {
-            return await _cloudantService.GetUserAsync(userMail);
+            return await _cloudantService.GetUserAsync(userId);
         }
 
         // PUT api/user
@@ -35,8 +35,7 @@ namespace CloudantDotNet.Controllers
 
             userReq.prev_token = (string.IsNullOrWhiteSpace(userReq.prev_token)) ? "" : userReq.prev_token;
             userReq.recent_token = (string.IsNullOrWhiteSpace(userReq.recent_token)) ? "" : userReq.recent_token;
-            userReq.user_mail = (string.IsNullOrWhiteSpace(userReq.user_mail)) ? "" : userReq.user_mail;
-            userReq.prev_user_mail = (string.IsNullOrWhiteSpace(userReq.prev_user_mail)) ? "" : userReq.prev_user_mail;
+            userReq.user_id = (string.IsNullOrWhiteSpace(userReq.user_id)) ? "" : userReq.user_id;
 
             try
             {
@@ -48,9 +47,9 @@ namespace CloudantDotNet.Controllers
                         item.token = userReq.recent_token;
                         item.push_cekilis = userReq.push_cekilis.Length > 1 ? userReq.push_cekilis.Substring(1, 1) : "T";
                         item.push_win = userReq.push_win.Length > 1 ? userReq.push_win.Substring(1, 1) : "T";
-                        if (!string.IsNullOrWhiteSpace(userReq.user_mail))
+                        if (!string.IsNullOrWhiteSpace(userReq.user_id))
                         {
-                            item.user_mail = userReq.user_mail;
+                            item.user_id = userReq.user_id;
                         }
                         await _cloudantService.UpdateAsync(item);
                     }
@@ -59,7 +58,7 @@ namespace CloudantDotNet.Controllers
                 {
                     User user = new User()
                     {
-                        user_mail = userReq.user_mail,
+                        user_id = userReq.user_id,
                         token = userReq.recent_token,
                         push_cekilis = userReq.push_cekilis.Length > 1 ? userReq.push_cekilis.Substring(1,1) : "T",
                         push_win = userReq.push_win.Length > 1 ? userReq.push_win.Substring(1, 1) : "T",
@@ -80,19 +79,18 @@ namespace CloudantDotNet.Controllers
         [Route("api/user/SaveUser")]
         public async Task<dynamic> PutUser([FromBody]UserRequestDto userReq)
         {
-            if (string.IsNullOrWhiteSpace(userReq.user_mail))
+            if (string.IsNullOrWhiteSpace(userReq.user_id))
                 return null;
             if (string.IsNullOrWhiteSpace(userReq.recent_token))
                 return null;
 
             userReq.prev_token = (string.IsNullOrWhiteSpace(userReq.prev_token)) ? "" : userReq.prev_token;
             userReq.recent_token = (string.IsNullOrWhiteSpace(userReq.recent_token)) ? "" : userReq.recent_token;
-            userReq.user_mail = (string.IsNullOrWhiteSpace(userReq.user_mail)) ? "" : userReq.user_mail;
-            userReq.prev_user_mail = (string.IsNullOrWhiteSpace(userReq.prev_user_mail)) ? "" : userReq.prev_user_mail;
+            userReq.user_id = (string.IsNullOrWhiteSpace(userReq.user_id)) ? "" : userReq.user_id;
 
             try
             {
-                List<User> userList = await _cloudantService.GetUserAsync(userReq.user_mail);
+                List<User> userList = await _cloudantService.GetUserAsync(userReq.user_id);
                 if (userList != null && userList.Any())
                 {
                     foreach (var user in userList)
@@ -110,7 +108,7 @@ namespace CloudantDotNet.Controllers
                 {
                     User user = new User()
                     {
-                        user_mail = userReq.user_mail,
+                        user_id = userReq.user_id,
                         token = userReq.recent_token,
                         push_cekilis = userReq.push_cekilis.Substring(1,1),
                         push_win = userReq.push_win.Substring(1, 1),
