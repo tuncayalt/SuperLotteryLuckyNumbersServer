@@ -7,6 +7,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace CloudantDotNet.Services
 {
@@ -215,6 +216,8 @@ namespace CloudantDotNet.Services
 
         public async Task<dynamic> CreateListAsync(CouponList items)
         {
+            items.docs.ForEach(c => c.ServerCalled = "T");
+
             using (var client = CloudantClient())
             {
                 var response = await client.PostAsJsonAsync(_dbName + "/_bulk_docs", items);
