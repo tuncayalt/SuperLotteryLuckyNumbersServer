@@ -287,6 +287,25 @@ namespace CloudantDotNet.Services
                 return new List<Coupon>();
             }
         }
+
+        public async Task<List<CouponDto>> GetWithLimitByTarih(string tarih, int updateCouponCount)
+        {
+            string lotteryTime = tarih.Substring(0, 4) + "/" + tarih.Substring(4, 2) + "/" + tarih.Substring(6, 2);
+            CouponSelectorWithLimitByTarih couponSelector = CouponSelectorWithLimitByTarih.Build(lotteryTime, updateCouponCount);
+            using (var client = CloudantClient())
+            {
+                var response = await client.PostAsJsonAsync(_dbName + "/_find", couponSelector);
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseJson = await response.Content.ReadAsStringAsync();
+                    CouponListDto couponList = JsonConvert.DeserializeObject<CouponListDto>(responseJson);
+                    return couponList.docs;
+                }
+                string msg = "Failure to GET. Status Code: " + response.StatusCode + ". Reason: " + response.ReasonPhrase;
+                Console.WriteLine(msg);
+                return new List<CouponDto>();
+            }
+        }
     }
 
     class LoggingHandler : DelegatingHandler

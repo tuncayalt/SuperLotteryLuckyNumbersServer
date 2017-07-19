@@ -2,23 +2,25 @@
 
 namespace CloudantDotNet.Models
 {
-    public class CouponSelectorForUserAndTarih
+    public class CouponSelectorWithLimitByTarih
     {
         public Selector selector { get; set; }
         public List<string> fields { get; set; }
+        public int limit { get; set; }
 
         public class Selector
         {
-            public string User { get; set; }
             public string LotteryTime { get; set; }
+            public int WinCount { get; set; }
         }
 
-        public static CouponSelectorForUserAndTarih Build(string userId, string lotteryTime)
+        public static CouponSelectorWithLimitByTarih Build(string tarih, int updateCouponCount)
         {
-            CouponSelectorForUserAndTarih couponSelector = new CouponSelectorForUserAndTarih();
+            CouponSelectorWithLimitByTarih couponSelector = new CouponSelectorWithLimitByTarih();
             couponSelector.selector = new Selector();
-            couponSelector.selector.User = userId;
-            couponSelector.selector.LotteryTime = lotteryTime;
+            couponSelector.selector.LotteryTime = tarih;
+            couponSelector.selector.WinCount = -1;
+            couponSelector.limit = updateCouponCount;
             couponSelector.fields = new List<string>();
             couponSelector.fields.Add("_id");
             couponSelector.fields.Add("_rev");

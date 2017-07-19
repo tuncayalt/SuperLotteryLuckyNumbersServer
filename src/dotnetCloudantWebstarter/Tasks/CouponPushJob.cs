@@ -1,8 +1,9 @@
-﻿using CloudantDotNet.Models;
-using CloudantDotNet.Services;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using CloudantDotNet.Services;
+using CloudantDotNet.Models;
 
 namespace CloudantDotNet.Tasks
 {
@@ -13,32 +14,33 @@ namespace CloudantDotNet.Tasks
         public int startMin { get; set; } = 0;
         public int endHour { get; set; } = 23;
         public int endMin { get; set; } = 59;
-        public TimeSpan onceIn { get; set; } = TimeSpan.FromMinutes(3);
+        public TimeSpan onceIn { get; set; } = TimeSpan.FromMinutes(1);
         public DateTime lastWorked { get; set; }
 
-        ICekilisCloudantService _cekilisService;
-        IUserCloudantService _userService;
-        IPushService _pushService;
-        ICouponsCloudantService _couponService;
+
+        private ICekilisCloudantService _cekilisService;
+        private ICouponsCloudantService _couponsService;
+        private IPushService _pushService;
+        private IUserCloudantService _userService;
 
         public event EventHandler<PushCouponEventArgs> onCouponPushFinished;
 
-        public CouponPushJob(ICekilisCloudantService cekilisService, IUserCloudantService userService, IPushService pushService, ICouponsCloudantService couponService)
+        public CouponPushJob(ICekilisCloudantService _cekilisService, IUserCloudantService _userService, IPushService _pushService, ICouponsCloudantService _couponsService)
         {
-            _cekilisService = cekilisService;
-            _userService = userService;
-            _pushService = pushService;
-            _couponService = couponService;
+            this._cekilisService = _cekilisService;
+            this._userService = _userService;
+            this._pushService = _pushService;
+            this._couponsService = _couponsService;
         }
 
         public void StartJob()
         {
-            SendPushToUsers();
+            SendCouponPushToUsers();
 
             Console.WriteLine("CouponPushJob ran:" + DateTime.UtcNow.GetTurkeyTime());
         }
 
-        private async void SendPushToUsers()
+        private async void SendCouponPushToUsers()
         {
             Cekilis cekilis = await _cekilisService.GetAsync();
             if (cekilis == null)
@@ -47,55 +49,36 @@ namespace CloudantDotNet.Tasks
             List<User> userList = await _userService.GetPushCekilis();
             if (userList == null || !userList.Any())
             {
-                PushFinished();
-                return;
-            }
-            List<CouponDto> couponList = await _couponService.GetAllByTarih(cekilis.tarih);
-            if (couponList == null || !couponList.Any())
-            {
-                PushFinished();
+                CouponPushFinished();
                 return;
             }
 
-            foreach (var user in userList)
+            foreach (User user in userList)
             {
-                List<CouponDto> userCouponList = couponList.Where(c => c.User.Equals(user.user_id)).ToList();
-                if (userCouponList == null || !userCouponList.Any())
-                {
+                List<CouponDto> couponList = await _couponsService.GetAllByUserNameAndTarih(user.user_id, cekilis.tarih);
+                if (couponList == null || !couponList.Any())
                     continue;
-                }
+                if (!couponList.Any(c => c.WinCount >= 3))
+                    continue;
 
-                int maxWinCount = 0;
-                foreach (CouponDto couponDto in userCouponList)
+                int maxWinCount = couponList.Max(c => c.WinCount);
+                PushNotification push = PushNotificationCoupon.Build(maxWinCount, cekilis.tarih_view, user.token);
+                try
                 {
-                    int winCount = GetWinCount(couponDto, cekilis);
-                    couponDto.WinCount = winCount;
-
-                    if (winCount > maxWinCount)
-                        maxWinCount = winCount;
-                }
-
-                CouponListDto couponListDto = new CouponListDto();
-                couponListDto.docs = userCouponList;
-                await _couponService.UpdateBulkAsync(couponListDto);
-
-                if (maxWinCount >= 3)
-                {
-                    PushNotification push = PushNotificationCoupon.Build(maxWinCount, cekilis.tarih_view, user.token);
                     await _pushService.SendPush(push);
                 }
+                catch (Exception)
+                {
+                    Console.WriteLine("Cant send push to user:" + user.user_id);
+                }
+
+                await Task.Delay(100);
             }
+
+            CouponPushFinished();
         }
 
-        private int GetWinCount(CouponDto coupon, Cekilis cekilis)
-        {
-            string[] couponNumbers = coupon.Numbers.Split('-');
-            string[] cekilisNumbers = cekilis.numbers.Split('-');
-
-            return couponNumbers.Where(n => cekilisNumbers.Contains(n)).Count();
-        }
-
-        private void PushFinished()
+        private void CouponPushFinished()
         {
             PushCouponEventArgs args = new PushCouponEventArgs()
             {
@@ -108,6 +91,4 @@ namespace CloudantDotNet.Tasks
     {
         public IJob job;
     }
-
-
 }

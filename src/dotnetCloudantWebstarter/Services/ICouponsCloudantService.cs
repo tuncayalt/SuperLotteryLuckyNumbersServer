@@ -1,5 +1,6 @@
 using CloudantDotNet.Models;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace CloudantDotNet.Services
 {
@@ -15,5 +16,6 @@ namespace CloudantDotNet.Services
         Task PopulateTestData();
         Task<string> UpdateAsync(Coupon item);
         Task<dynamic> UpdateBulkAsync(CouponListDto items);
+        Task<List<CouponDto>> GetWithLimitByTarih(string tarih, int updateCouponCount);
     }
 }

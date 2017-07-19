@@ -33,7 +33,7 @@ namespace CloudantDotNet.Tasks
         private void YeniCekilisInvoked(object sender, CekilisEventArgs e)
         {
             AddCekilisPushJob();
-            AddCouponPushJob();
+            AddCouponUpdateJob();
         }
 
         private void AddCekilisJob()
@@ -43,15 +43,17 @@ namespace CloudantDotNet.Tasks
             AddJob(cekilisJob);
         }
 
-        private void AddCouponPushJob()
+        private void AddCouponUpdateJob()
         {
-            CouponPushJob couponPushJob = new CouponPushJob(_cekilisService, _userService, _pushService, _couponsService);
-            PushCouponEventArgs args = new PushCouponEventArgs();
-            args.job = couponPushJob;
-            couponPushJob.onCouponPushFinished += CouponPushFinishedInvoked;
-            AddJob(couponPushJob);
+            CouponUpdateJob couponUpdateJob = new CouponUpdateJob(_cekilisService, _userService, _pushService, _couponsService);
+            UpdateCouponEventArgs args = new UpdateCouponEventArgs();
+            args.job = couponUpdateJob;
+            couponUpdateJob.onCouponUpdateFinished += CouponUpdateFinishedInvoked;
+            couponUpdateJob.onCouponPushCanStart += CouponPushCanStartInvoked;
+            AddJob(couponUpdateJob);
         }
 
+        
         private void AddCekilisPushJob()
         {
             CekilisPushJob cekilisPushJob = new CekilisPushJob(_cekilisService, _userService, _pushService);
@@ -66,10 +68,29 @@ namespace CloudantDotNet.Tasks
             RemoveJob(e.job);
         }
 
+        private void CouponUpdateFinishedInvoked(object sender, UpdateCouponEventArgs e)
+        {
+            RemoveJob(e.job);
+        }
+
         private void CouponPushFinishedInvoked(object sender, PushCouponEventArgs e)
         {
             RemoveJob(e.job);
         }
+
+        private void CouponPushCanStartInvoked(object sender, EventArgs e)
+        {
+            AddCouponPushJob();
+        }
+
+        private void AddCouponPushJob()
+        {
+            CouponPushJob couponPushJob = new CouponPushJob(_cekilisService, _userService, _pushService, _couponsService);
+            couponPushJob.onCouponPushFinished += CouponPushFinishedInvoked;
+            AddJob(couponPushJob);
+        }
+
+        
 
         private void CallJobsRepeatedly(TimeSpan interval)
         {
