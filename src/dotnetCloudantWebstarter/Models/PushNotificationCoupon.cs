@@ -9,7 +9,7 @@
             push.data.score = maxViewCount.ToString();
             push.data.time = tarihView;
             push.notification = new Notification();
-            push.notification.title = "Super Loto'da kazandınız!";
+            push.notification.title = "Super Loto'da kazandiniz!";
             push.notification.body = tarihView + " tarihli cekilisten " + maxViewCount + " tutturdunuz!";
             push.to = to;
             return push;

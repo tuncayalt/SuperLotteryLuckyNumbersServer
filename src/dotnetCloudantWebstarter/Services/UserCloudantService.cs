@@ -88,8 +88,12 @@ namespace CloudantDotNet.Services
                         }
                     }
                 }
-                string msg = "Failure to GET. Status Code: " + response.StatusCode + ". Reason: " + response.ReasonPhrase;
-                Console.WriteLine(msg);
+                else
+                {
+                    string msg = "Failure to GET. Status Code: " + response.StatusCode + ". Reason: " + response.ReasonPhrase;
+                    Console.WriteLine(msg);
+                }
+                
                 return userList;
             }
 
@@ -129,8 +133,12 @@ namespace CloudantDotNet.Services
                         }
                     }
                 }
-                string msg = "Failure to GET. Status Code: " + response.StatusCode + ". Reason: " + response.ReasonPhrase;
-                Console.WriteLine(msg);
+                else
+                {
+                    string msg = "Failure to GET. Status Code: " + response.StatusCode + ". Reason: " + response.ReasonPhrase;
+                    Console.WriteLine(msg);
+                }
+                
                 return userList;
             }
         }
@@ -168,8 +176,12 @@ namespace CloudantDotNet.Services
                         }
                     }
                 }
-                string msg = "Failure to GET. Status Code: " + response.StatusCode + ". Reason: " + response.ReasonPhrase;
-                Console.WriteLine(msg);
+                else
+                {
+                    string msg = "Failure to GET. Status Code: " + response.StatusCode + ". Reason: " + response.ReasonPhrase;
+                    Console.WriteLine(msg);
+                }
+                
                 return userList;
             }
         }

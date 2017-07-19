@@ -70,21 +70,7 @@ namespace CloudantDotNet.Tasks
                 {
                     int winCount = GetWinCount(couponDto, cekilis);
                     couponDto.WinCount = winCount;
-                    //Coupon coupon = new Coupon
-                    //{
-                    //    id = couponDto._id,
-                    //    rev = couponDto._rev,
-                    //    CouponId = couponDto.CouponId,
-                    //    GameType = couponDto.GameType,
-                    //    LotteryTime = couponDto.LotteryTime,
-                    //    Numbers = couponDto.Numbers,
-                    //    PlayTime = couponDto.PlayTime,
-                    //    ServerCalled = couponDto.ServerCalled,
-                    //    ToRemind = couponDto.ToRemind,
-                    //    User = couponDto.User,
-                    //    WinCount = couponDto.WinCount
-                    //};
-                    //await _couponService.UpdateAsync(coupon);
+
                     if (winCount > maxWinCount)
                         maxWinCount = winCount;
                 }
@@ -99,7 +85,6 @@ namespace CloudantDotNet.Tasks
                     await _pushService.SendPush(push);
                 }
             }
-            //PushFinished();
         }
 
         private int GetWinCount(CouponDto coupon, Cekilis cekilis)

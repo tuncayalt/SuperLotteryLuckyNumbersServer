@@ -25,10 +25,7 @@ namespace CloudantDotNet.Tasks
             _pushService = pushService;
 
             jobs = new List<IJob>();
-
-            CekilisJob cekilisJob = new CekilisJob(_cekilisService, _mpService);
-            cekilisJob.onYeniCekilis += YeniCekilisInvoked;
-            AddJob(cekilisJob);
+            AddCekilisJob();
 
             CallJobsRepeatedly(TimeSpan.FromSeconds(60));
         }
@@ -37,6 +34,13 @@ namespace CloudantDotNet.Tasks
         {
             AddCekilisPushJob();
             AddCouponPushJob();
+        }
+
+        private void AddCekilisJob()
+        {
+            CekilisJob cekilisJob = new CekilisJob(_cekilisService, _mpService);
+            cekilisJob.onYeniCekilis += YeniCekilisInvoked;
+            AddJob(cekilisJob);
         }
 
         private void AddCouponPushJob()
