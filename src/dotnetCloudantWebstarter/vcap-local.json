@@ -1,11 +1,77 @@
+//{
+//  "AvailabilityMonitoring": [
+//    {
+//      "credentials": {
+//        "cred_url": "https://perfbroker.eu-gb.bluemix.net",
+//        "token": "NpgyeO7pvv53lZC4G8dpQ3Nkrf58PrActmvBiG6Noz8TZGkM78WWwbIdZJual50hNDqoILmRic+W30Zu7ULVJswsRp0kSrc72og/uvI9eVQ="
+//      },
+//      "syslog_drain_url": null,
+//      "label": "AvailabilityMonitoring",
+//      "provider": null,
+//      "plan": "Lite",
+//      "name": "availability-monitoring-auto",
+//      "tags": [
+//        "ibm_created",
+//        "bluemix_extensions",
+//        "dev_ops"
+//      ]
+//    }
+//  ],
+//  "cloudantNoSQLDB": [
+//    {
+//      "credentials": {
+//        "username": "9569e5a2-f448-45a1-bc95-e59be3bd9736-bluemix",
+//        "password": "0f96424af8a4735ce234d6fad572c85869d22260394b2a18ab6ca2208cc68d71",
+//        "host": "9569e5a2-f448-45a1-bc95-e59be3bd9736-bluemix.cloudant.com",
+//        "port": 443,
+//        "url": "https://9569e5a2-f448-45a1-bc95-e59be3bd9736-bluemix:0f96424af8a4735ce234d6fad572c85869d22260394b2a18ab6ca2208cc68d71@9569e5a2-f448-45a1-bc95-e59be3bd9736-bluemix.cloudant.com"
+//      },
+//      "syslog_drain_url": null,
+//      "label": "cloudantNoSQLDB",
+//      "provider": null,
+//      "plan": "Lite",
+//      "name": "SuperLotteryLuckyNumbersServer-cloudantNoSQLDB",
+//      "tags": [
+//        "data_management",
+//        "ibm_created",
+//        "lite",
+//        "ibm_dedicated_public"
+//      ]
+//    }
+//  ]
+//}
 {
+  "cloudantNoSQLDB": [
+    {
+      "credentials": {
+        "username": "56cc1dc4-b146-4456-9246-f337c0fae161-bluemix",
+        "password": "f0c0a13f643e3d2a5e72a8c647dd0cf0c985d3a3892bd765a3fb85b5088ae2e0",
+        "host": "56cc1dc4-b146-4456-9246-f337c0fae161-bluemix.cloudant.com",
+        "port": 443,
+        "url": "https://56cc1dc4-b146-4456-9246-f337c0fae161-bluemix:f0c0a13f643e3d2a5e72a8c647dd0cf0c985d3a3892bd765a3fb85b5088ae2e0@56cc1dc4-b146-4456-9246-f337c0fae161-bluemix.cloudant.com"
+      },
+      "syslog_drain_url": null,
+      "volume_mounts": [],
+      "label": "cloudantNoSQLDB",
+      "provider": null,
+      "plan": "Lite",
+      "name": "SuperLotteryLuckyNumbersServerTest-cloudantNoSQLDB",
+      "tags": [
+        "data_management",
+        "ibm_created",
+        "lite",
+        "ibm_dedicated_public"
+      ]
+    }
+  ],
   "AvailabilityMonitoring": [
     {
       "credentials": {
         "cred_url": "https://perfbroker.eu-gb.bluemix.net",
-        "token": "NpgyeO7pvv53lZC4G8dpQ3Nkrf58PrActmvBiG6Noz8TZGkM78WWwbIdZJual50hNDqoILmRic+W30Zu7ULVJswsRp0kSrc72og/uvI9eVQ="
+        "token": "4QP5R/9NthKCneCUyPBAN0EkTaRWNPNRIBvU9Xv7Vcygeu7Cod52eP2+gXVQC9/XC67gGjmEVCJ1T8kTpLkgVSqxHpAEls46lmhkHlyYHKU="
       },
       "syslog_drain_url": null,
+      "volume_mounts": [],
       "label": "AvailabilityMonitoring",
       "provider": null,
       "plan": "Lite",
@@ -13,29 +79,8 @@
       "tags": [
         "ibm_created",
         "bluemix_extensions",
-        "dev_ops"
-      ]
-    }
-  ],
-  "cloudantNoSQLDB": [
-    {
-      "credentials": {
-        "username": "9569e5a2-f448-45a1-bc95-e59be3bd9736-bluemix",
-        "password": "0f96424af8a4735ce234d6fad572c85869d22260394b2a18ab6ca2208cc68d71",
-        "host": "9569e5a2-f448-45a1-bc95-e59be3bd9736-bluemix.cloudant.com",
-        "port": 443,
-        "url": "https://9569e5a2-f448-45a1-bc95-e59be3bd9736-bluemix:0f96424af8a4735ce234d6fad572c85869d22260394b2a18ab6ca2208cc68d71@9569e5a2-f448-45a1-bc95-e59be3bd9736-bluemix.cloudant.com"
-      },
-      "syslog_drain_url": null,
-      "label": "cloudantNoSQLDB",
-      "provider": null,
-      "plan": "Lite",
-      "name": "SuperLotteryLuckyNumbersServer-cloudantNoSQLDB",
-      "tags": [
-        "data_management",
-        "ibm_created",
-        "lite",
-        "ibm_dedicated_public"
+        "dev_ops",
+        "lite"
       ]
     }
   ]

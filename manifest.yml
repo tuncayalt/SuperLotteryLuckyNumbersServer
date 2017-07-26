@@ -1,11 +1,22 @@
+#applications:
+#- path: .
+  #memory: 256M
+  #instances: 1
+  #domain: eu-gb.mybluemix.net
+  #name: SuperLotteryLuckyNumbersServer
+  #host: SuperLotteryLuckyNumbersServer
+  #disk_quota: 1024M
+  #services:
+  #- availability-monitoring-auto
+  #- SuperLotteryLuckyNumbersServer-cloudantNoSQLDB
 applications:
 - path: .
   memory: 256M
   instances: 1
   domain: eu-gb.mybluemix.net
-  name: SuperLotteryLuckyNumbersServer
-  host: SuperLotteryLuckyNumbersServer
+  name: SuperLotteryLuckyNumbersServerTest
+  host: SuperLotteryLuckyNumbersServerTest
   disk_quota: 1024M
   services:
   - availability-monitoring-auto
-  - SuperLotteryLuckyNumbersServer-cloudantNoSQLDB
+  - SuperLotteryLuckyNumbersServerTest-cloudantNoSQLDB
