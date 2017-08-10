@@ -1,4 +1,4 @@
-# ASP.NET Core Cloudant Sample
+# SuperLotteryLuckyNumbersServer
 
 This application demonstrates how to use the Bluemix Cloudant NoSQL DB Service in an ASP.NET Core application.
 
