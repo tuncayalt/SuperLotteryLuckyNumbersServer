@@ -49,7 +49,13 @@ namespace CloudantDotNet.Tasks
                 foreach (var user in userList)
                 {
                     PushNotificationCekilis push = PushNotificationCekilis.Build(cekilis.numbers, cekilis.tarih_view, user.token);
-                    await _pushService.SendPush(push);
+                    bool pushResult = await _pushService.SendPush(push);
+                    if (!pushResult)
+                    {
+                        user.push_cekilis = "F";
+                        user.push_win = "F";
+                        await _userService.UpdateAsync(user);
+                    }
                 }
             }
 

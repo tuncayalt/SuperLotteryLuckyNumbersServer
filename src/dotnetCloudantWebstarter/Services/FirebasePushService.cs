@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using CloudantDotNet.Models;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using Newtonsoft.Json;
+using dotnetCloudantWebstarter.Models;
 
 namespace CloudantDotNet.Services
 {
@@ -22,10 +24,20 @@ namespace CloudantDotNet.Services
                 {
                     string result = response.Content.ReadAsStringAsync().Result;
 
-                    return true;
+                    if (!string.IsNullOrWhiteSpace(result))
+                    {
+                        PushNotificationResult resultObject = JsonConvert.DeserializeObject<PushNotificationResult>(result);
+                        if (resultObject != null && resultObject.results != null && resultObject.results.Count > 0 && !string.IsNullOrWhiteSpace(resultObject.results[0].error))
+                        {
+                            if (resultObject.results[0].error.Equals("NotRegistered"))
+                            {
+                                return false;
+                            }
+                        }
+                    }
                 }
 
-                return false;
+                return true;
             }
         }
 

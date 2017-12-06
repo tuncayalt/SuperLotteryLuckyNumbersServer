@@ -110,8 +110,9 @@ namespace CloudantDotNet.Tasks
             {
                 if (JobWillStart(job))
                 {
-                    Task jobTask = new Task(job.StartJob);
-                    jobTask.Start();
+                    //Task jobTask = new Task(job.StartJob);
+                    //jobTask.Start();
+                    job.StartJob();
                     job.lastWorked = DateTime.UtcNow.GetTurkeyTime();
                 }
 
