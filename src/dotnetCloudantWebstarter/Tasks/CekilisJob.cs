@@ -29,16 +29,18 @@ namespace CloudantDotNet.Tasks
 
         public void StartJob()
         {
-            UpdateCekilis();
+            UpdateCekilis().Wait();
 
             Console.WriteLine("CekilisJob ran:" + DateTime.UtcNow.GetTurkeyTime());
         }
 
-        private async void UpdateCekilis()
+        private async Task UpdateCekilis()
         {
             try
             {
                 Cekilis cekilisDb = await GetCekilisFromDB();
+                if (cekilisDb == null)
+                    return;
 
                 if (DateTime.UtcNow.GetTurkeyTime() - cekilisDb.GetDateTime() <= TimeSpan.FromDays(6))
                     return;

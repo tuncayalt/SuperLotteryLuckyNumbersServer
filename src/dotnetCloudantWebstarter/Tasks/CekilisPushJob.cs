@@ -2,6 +2,7 @@
 using CloudantDotNet.Services;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace CloudantDotNet.Tasks
 {
@@ -30,12 +31,12 @@ namespace CloudantDotNet.Tasks
 
         public void StartJob()
         {
-            SendPushToUsers();
+            SendPushToUsers().Wait();
 
             Console.WriteLine("CekilisPushJob ran:" + DateTime.UtcNow.GetTurkeyTime());
         }
 
-        private async void SendPushToUsers()
+        private async Task SendPushToUsers()
         {
             Cekilis cekilis = await _cekilisService.GetAsync();
             if (cekilis == null)
@@ -56,6 +57,7 @@ namespace CloudantDotNet.Tasks
                         user.push_win = "F";
                         await _userService.UpdateAsync(user);
                     }
+                    await Task.Delay(100);
                 }
             }
 

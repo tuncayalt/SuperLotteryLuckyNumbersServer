@@ -3,6 +3,7 @@ using CloudantDotNet.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace CloudantDotNet.Tasks
 {
@@ -15,7 +16,7 @@ namespace CloudantDotNet.Tasks
         public int endMin { get; set; } = 59;
         public TimeSpan onceIn { get; set; } = TimeSpan.FromMinutes(1);
         public DateTime lastWorked { get; set; }
-        public int updateCouponCount { get; set; } = 300;
+        public int updateCouponCount { get; set; } = 200;
 
         ICekilisCloudantService _cekilisService;
         IUserCloudantService _userService;
@@ -35,23 +36,25 @@ namespace CloudantDotNet.Tasks
 
         public void StartJob()
         {
-            UpdateUserWinCounts();
+            UpdateUserWinCounts().Wait();
 
             Console.WriteLine("CouponUpdateJob ran:" + DateTime.UtcNow.GetTurkeyTime());
         }
 
-        private async void UpdateUserWinCounts()
+        private async Task UpdateUserWinCounts()
         {
             Cekilis cekilis = await _cekilisService.GetAsync();
             if (cekilis == null)
                 return;
 
+            /*
             List<User> userList = await _userService.GetPushCekilis();
             if (userList == null || !userList.Any())
             {
                 CouponUpdateFinished();
                 return;
             }
+            */
             List<CouponDto> couponList = await _couponService.GetWithLimitByTarih(cekilis.tarih, updateCouponCount);
             if (couponList == null || !couponList.Any())
             {
@@ -60,6 +63,16 @@ namespace CloudantDotNet.Tasks
                 return;
             }
 
+            foreach (CouponDto couponDto in couponList)
+            {
+                int winCount = GetWinCount(couponDto, cekilis);
+                couponDto.WinCount = winCount;
+            }
+            CouponListDto couponListDto = new CouponListDto();
+            couponListDto.docs = couponList;
+            await _couponService.UpdateBulkAsync(couponListDto);
+
+            /*
             foreach (var user in userList)
             {
                 List<CouponDto> userCouponList = couponList.Where(c => c.User.Equals(user.user_id)).ToList();
@@ -84,6 +97,7 @@ namespace CloudantDotNet.Tasks
                 //    await _pushService.SendPush(push);
                 //}
             }
+            */
         }
 
         private int GetWinCount(CouponDto coupon, Cekilis cekilis)

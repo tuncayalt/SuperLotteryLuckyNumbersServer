@@ -106,7 +106,7 @@ namespace CloudantDotNet.Tasks
 
         private void StartJobs()
         {
-            foreach (IJob job in jobs)
+            foreach (IJob job in jobs.ToList())
             {
                 if (JobWillStart(job))
                 {

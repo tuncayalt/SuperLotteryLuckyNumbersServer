@@ -35,12 +35,12 @@ namespace CloudantDotNet.Tasks
 
         public void StartJob()
         {
-            SendCouponPushToUsers();
+            SendCouponPushToUsers().Wait();
 
             Console.WriteLine("CouponPushJob ran:" + DateTime.UtcNow.GetTurkeyTime());
         }
 
-        private async void SendCouponPushToUsers()
+        private async Task SendCouponPushToUsers()
         {
             Cekilis cekilis = await _cekilisService.GetAsync();
             if (cekilis == null)
@@ -55,7 +55,7 @@ namespace CloudantDotNet.Tasks
 
             foreach (User user in userList)
             {
-                List<CouponDto> couponList = await _couponsService.GetAllByUserNameAndTarih(user.user_id, cekilis.tarih);
+                List<Coupon> couponList = await _couponsService.GetAllByUserNameAndTarih(user.user_id, cekilis.tarih);
                 if (couponList == null || !couponList.Any())
                     continue;
                 if (!couponList.Any(c => c.WinCount >= 3))
