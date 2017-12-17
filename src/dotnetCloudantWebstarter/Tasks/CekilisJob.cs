@@ -18,7 +18,7 @@ namespace CloudantDotNet.Tasks
         ICekilisCloudantService _cloudantService;
         IMilliPiyangoService _mpService;
 
-        public event EventHandler<CekilisEventArgs> onYeniCekilis;
+        public event EventHandler<CekilisEventArgs> onYeniCekilisFinished;
 
         public CekilisJob(ICekilisCloudantService cloudantService, IMilliPiyangoService mpService)
         {
@@ -71,7 +71,7 @@ namespace CloudantDotNet.Tasks
             {
                 numbers = cekilisInserted.numbers
             };
-            onYeniCekilis(this, args);
+            onYeniCekilisFinished(this, args);
         }
 
         private async Task<Cekilis> InsertCekilisToDB(Cekilis cekilisMP)

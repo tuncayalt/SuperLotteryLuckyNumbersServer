@@ -16,7 +16,7 @@ namespace CloudantDotNet.Tasks
         public int endMin { get; set; } = 59;
         public TimeSpan onceIn { get; set; } = TimeSpan.FromMinutes(1);
         public DateTime lastWorked { get; set; }
-        public int updateCouponCount { get; set; } = 200;
+        public int updateCouponCount { get; set; } = 300;
 
         ICekilisCloudantService _cekilisService;
         IUserCloudantService _userService;
@@ -24,7 +24,6 @@ namespace CloudantDotNet.Tasks
         ICouponsCloudantService _couponService;
 
         public event EventHandler<UpdateCouponEventArgs> onCouponUpdateFinished;
-        public event EventHandler<EventArgs> onCouponPushCanStart;
 
         public CouponUpdateJob(ICekilisCloudantService cekilisService, IUserCloudantService userService, IPushService pushService, ICouponsCloudantService couponService)
         {
@@ -59,7 +58,6 @@ namespace CloudantDotNet.Tasks
             if (couponList == null || !couponList.Any())
             {
                 CouponUpdateFinished();
-                CouponPushCanStart();
                 return;
             }
 
@@ -99,7 +97,7 @@ namespace CloudantDotNet.Tasks
             }
             */
         }
-
+        
         private int GetWinCount(CouponDto coupon, Cekilis cekilis)
         {
             string[] couponNumbers = coupon.Numbers.Split('-');
@@ -117,15 +115,9 @@ namespace CloudantDotNet.Tasks
             onCouponUpdateFinished.Invoke(this, args);
         }
 
-        private void CouponPushCanStart()
-        {
-            onCouponPushCanStart.Invoke(this, new EventArgs());
-        }
     }
     public class UpdateCouponEventArgs : EventArgs
     {
         public IJob job;
     }
-
-
 }

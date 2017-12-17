@@ -27,20 +27,19 @@ namespace CloudantDotNet.Tasks
             jobs = new List<IJob>();
             AddCekilisJob();
 
-            CallJobsRepeatedly(TimeSpan.FromSeconds(60));
-        }
-
-        private void YeniCekilisInvoked(object sender, CekilisEventArgs e)
-        {
-            AddCekilisPushJob();
-            AddCouponUpdateJob();
+            CallJobsRepeatedly(TimeSpan.FromSeconds(45));
         }
 
         private void AddCekilisJob()
         {
             CekilisJob cekilisJob = new CekilisJob(_cekilisService, _mpService);
-            cekilisJob.onYeniCekilis += YeniCekilisInvoked;
+            cekilisJob.onYeniCekilisFinished += YeniCekilisInvoked;
             AddJob(cekilisJob);
+        }
+
+        private void YeniCekilisInvoked(object sender, CekilisEventArgs e)
+        {
+            AddCouponUpdateJob();
         }
 
         private void AddCouponUpdateJob()
@@ -49,11 +48,9 @@ namespace CloudantDotNet.Tasks
             UpdateCouponEventArgs args = new UpdateCouponEventArgs();
             args.job = couponUpdateJob;
             couponUpdateJob.onCouponUpdateFinished += CouponUpdateFinishedInvoked;
-            couponUpdateJob.onCouponPushCanStart += CouponPushCanStartInvoked;
             AddJob(couponUpdateJob);
         }
 
-        
         private void AddCekilisPushJob()
         {
             CekilisPushJob cekilisPushJob = new CekilisPushJob(_cekilisService, _userService, _pushService);
@@ -63,24 +60,21 @@ namespace CloudantDotNet.Tasks
             AddJob(cekilisPushJob);
         }
 
-        private void CekilisPushFinishedInvoked(object sender, PushCekilisEventArgs e)
-        {
-            RemoveJob(e.job);
-        }
-
         private void CouponUpdateFinishedInvoked(object sender, UpdateCouponEventArgs e)
         {
             RemoveJob(e.job);
+            AddCouponPushJob();
         }
 
         private void CouponPushFinishedInvoked(object sender, PushCouponEventArgs e)
         {
             RemoveJob(e.job);
+            AddCekilisPushJob();
         }
 
-        private void CouponPushCanStartInvoked(object sender, EventArgs e)
+        private void CekilisPushFinishedInvoked(object sender, PushCekilisEventArgs e)
         {
-            AddCouponPushJob();
+            RemoveJob(e.job);
         }
 
         private void AddCouponPushJob()
@@ -89,8 +83,6 @@ namespace CloudantDotNet.Tasks
             couponPushJob.onCouponPushFinished += CouponPushFinishedInvoked;
             AddJob(couponPushJob);
         }
-
-        
 
         private void CallJobsRepeatedly(TimeSpan interval)
         {
@@ -110,8 +102,6 @@ namespace CloudantDotNet.Tasks
             {
                 if (JobWillStart(job))
                 {
-                    //Task jobTask = new Task(job.StartJob);
-                    //jobTask.Start();
                     job.StartJob();
                     job.lastWorked = DateTime.UtcNow.GetTurkeyTime();
                 }
