@@ -47,9 +47,38 @@ namespace CloudantDotNet.Controllers
 
         // DELETE api/Coupon/5
         [HttpDelete("{couponId}")]
-        public async Task<bool> Delete(string couponId)
+        public async Task<List<string>> Delete(string couponId)
         {
-            return await _cloudantService.DeleteAsync(couponId);
+            if (couponId.Contains("["))
+            {
+                string couponIdTemp = couponId.Replace("[", "").Replace("]", "");
+                if (couponIdTemp == null || string.IsNullOrWhiteSpace(couponIdTemp))
+                {
+                    return new List<string>();
+                }
+
+                string[] couponIdArray = couponIdTemp.Split(',');
+                if (couponIdArray == null || !couponIdArray.Any())
+                {
+                    return new List<string>();
+                }
+
+                List<string> couponIdList = couponIdArray.Select(c => c.Trim()).ToList();
+
+                List<CouponToDeleteDto> couponList = await _cloudantService.GetListByCouponIds(couponIdList);
+                couponList.ForEach(c => c._deleted = true);
+
+                CouponListToDeleteDto couponListDto = new CouponListToDeleteDto();
+                couponListDto.docs = couponList;
+                List<CouponAfterDeleteDto> couponsDeleteResponse = await _cloudantService.DeleteBulkAsync(couponListDto);
+                List<string> couponIdsDeleted = couponList.Where(c => couponsDeleteResponse.Where(a => a.ok).Select(c1 => c1.id).ToList().Contains(c._id)).Select(o => o.CouponId).ToList();
+                return couponIdsDeleted;
+            }
+            else
+            {
+                return await _cloudantService.DeleteAsync(couponId);
+            }
+            
         }
     }
 }

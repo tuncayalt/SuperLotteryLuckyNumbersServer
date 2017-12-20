@@ -29,4 +29,19 @@
         public string ServerCalled { get; set; }
         public int WinCount { get; set; }
     }
+
+    public class CouponToDeleteDto
+    {
+        public string _id { get; set; }
+        public string _rev { get; set; }
+        public string CouponId { get; set; }
+        public bool _deleted { get; set; }
+    }
+
+    public class CouponAfterDeleteDto
+    {
+        public string id { get; set; }
+        public string rev { get; set; }
+        public bool ok { get; set; }
+    }
 }

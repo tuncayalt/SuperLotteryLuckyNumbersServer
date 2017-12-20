@@ -87,6 +87,23 @@ namespace CloudantDotNet.Services
             }
         }
 
+        public async Task<dynamic> DeleteBulkAsync(CouponListToDeleteDto items)
+        {
+            using (var client = CloudantClient())
+            {
+                var response = await client.PostAsJsonAsync(_dbName + "/_bulk_docs", items);
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseJson = await response.Content.ReadAsStringAsync();
+                    List<CouponAfterDeleteDto> couponList = JsonConvert.DeserializeObject<List<CouponAfterDeleteDto>>(responseJson);
+                    return couponList;
+                }
+                string msg = "Failure to PUT. Status Code: " + response.StatusCode + ". Reason: " + response.ReasonPhrase;
+                Console.WriteLine(msg);
+                return new List<CouponAfterDeleteDto>();
+            }
+        }
+
         public async Task<dynamic> GetAllAsync()
         {
             using (var client = CloudantClient())
@@ -304,6 +321,24 @@ namespace CloudantDotNet.Services
                 string msg = "Failure to GET. Status Code: " + response.StatusCode + ". Reason: " + response.ReasonPhrase;
                 Console.WriteLine(msg);
                 return new List<CouponDto>();
+            }
+        }
+
+        public async Task<dynamic> GetListByCouponIds(List<string> couponIds)
+        {
+            CouponSelectorForBulkId couponSelector = CouponSelectorForBulkId.Build(couponIds);
+            using (var client = CloudantClient())
+            {
+                var response = await client.PostAsJsonAsync(_dbName + "/_find", couponSelector);
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseJson = await response.Content.ReadAsStringAsync();
+                    CouponListToDeleteDto couponList = JsonConvert.DeserializeObject<CouponListToDeleteDto>(responseJson);
+                    return couponList.docs;
+                }
+                string msg = "Failure to GET. Status Code: " + response.StatusCode + ". Reason: " + response.ReasonPhrase;
+                Console.WriteLine(msg);
+                return new List<CouponListToDeleteDto>();
             }
         }
     }
