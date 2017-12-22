@@ -47,7 +47,7 @@ namespace CloudantDotNet.Controllers
 
         // DELETE api/Coupon/5
         [HttpDelete("{couponId}")]
-        public async Task<List<string>> Delete(string couponId)
+        public async Task<dynamic> Delete(string couponId)
         {
             if (couponId.Contains("["))
             {
