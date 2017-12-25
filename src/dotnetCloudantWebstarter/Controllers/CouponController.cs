@@ -47,20 +47,20 @@ namespace CloudantDotNet.Controllers
 
         // DELETE api/Coupon/5
         [HttpDelete("{couponId}")]
-        public async Task<dynamic> Delete(string couponId)
+        public async Task<bool> Delete(string couponId)
         {
             if (couponId.Contains("["))
             {
                 string couponIdTemp = couponId.Replace("[", "").Replace("]", "");
                 if (couponIdTemp == null || string.IsNullOrWhiteSpace(couponIdTemp))
                 {
-                    return new List<string>();
+                    return false;
                 }
 
                 string[] couponIdArray = couponIdTemp.Split(',');
                 if (couponIdArray == null || !couponIdArray.Any())
                 {
-                    return new List<string>();
+                    return false;
                 }
 
                 List<string> couponIdList = couponIdArray.Select(c => c.Trim()).ToList();
@@ -70,9 +70,7 @@ namespace CloudantDotNet.Controllers
 
                 CouponListToDeleteDto couponListDto = new CouponListToDeleteDto();
                 couponListDto.docs = couponList;
-                List<CouponAfterDeleteDto> couponsDeleteResponse = await _cloudantService.DeleteBulkAsync(couponListDto);
-                List<string> couponIdsDeleted = couponList.Where(c => couponsDeleteResponse.Where(a => a.ok).Select(c1 => c1.id).ToList().Contains(c._id)).Select(o => o.CouponId).ToList();
-                return couponIdsDeleted;
+                return await _cloudantService.DeleteBulkAsync(couponListDto);
             }
             else
             {

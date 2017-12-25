@@ -94,13 +94,11 @@ namespace CloudantDotNet.Services
                 var response = await client.PostAsJsonAsync(_dbName + "/_bulk_docs", items);
                 if (response.IsSuccessStatusCode)
                 {
-                    var responseJson = await response.Content.ReadAsStringAsync();
-                    List<CouponAfterDeleteDto> couponList = JsonConvert.DeserializeObject<List<CouponAfterDeleteDto>>(responseJson);
-                    return couponList;
+                    return true;
                 }
                 string msg = "Failure to PUT. Status Code: " + response.StatusCode + ". Reason: " + response.ReasonPhrase;
                 Console.WriteLine(msg);
-                return new List<CouponAfterDeleteDto>();
+                return false;
             }
         }
 
