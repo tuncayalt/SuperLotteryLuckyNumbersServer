@@ -1,4 +1,5 @@
 ﻿using CloudantDotNet.Models;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace CloudantDotNet.Services
@@ -10,5 +11,6 @@ namespace CloudantDotNet.Services
         Task<Cekilis> GetAsync();
         Task PopulateTestData();
         Task<string> UpdateAsync(Coupon item);
+        Task<List<Cekilis>> GetAllAsync();
     }
 }

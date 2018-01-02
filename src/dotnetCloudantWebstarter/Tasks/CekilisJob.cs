@@ -1,5 +1,6 @@
 ﻿using CloudantDotNet.Models;
 using CloudantDotNet.Services;
+using dotnetCloudantWebstarter.Cache;
 using System;
 using System.Threading.Tasks;
 
@@ -53,6 +54,8 @@ namespace CloudantDotNet.Tasks
                 Cekilis cekilisMP = await GetCekilisFromMP(dateInMP);
 
                 Cekilis cekilisInserted = await InsertCekilisToDB(cekilisMP);
+                CekilisCache.AddCekilis(cekilisMP);
+
                 if (cekilisInserted != null && !string.IsNullOrWhiteSpace(cekilisInserted.numbers))
                 {
                     InvokeYeniCekilisEvent(cekilisInserted);

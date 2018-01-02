@@ -27,5 +27,24 @@ namespace CloudantDotNet.Models
         {
             public string tarih { get; set; }
         }
+
+        public static CekilisSelector Build(int limit)
+        {
+            CekilisSelector cekSelector = new CekilisSelector();
+            cekSelector.selector = new CekilisSelector.Selector();
+            cekSelector.selector.tarih = new CekilisSelector.tarih();
+            cekSelector.selector.tarih.gt = 0;
+            cekSelector.fields = new List<string>();
+            cekSelector.fields.Add("tarih");
+            cekSelector.fields.Add("tarih_view");
+            cekSelector.fields.Add("numbers");
+            cekSelector.limit = limit;
+            cekSelector.sort = new List<CekilisSelector.Sort>();
+            cekSelector.sort.Add(new CekilisSelector.Sort()
+            {
+                tarih = "desc"
+            });
+            return cekSelector;
+        }
     }
 }

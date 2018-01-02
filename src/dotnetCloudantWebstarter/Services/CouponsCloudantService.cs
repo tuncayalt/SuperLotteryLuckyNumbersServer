@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using System.Linq;
+using dotnetCloudantWebstarter.Cache;
 
 namespace CloudantDotNet.Services
 {
@@ -233,6 +234,13 @@ namespace CloudantDotNet.Services
         {
             items.docs.ForEach(c => c.ServerCalled = "T");
 
+            Cekilis cekilis = CekilisCache.cekilisList
+                .Where(c => c.tarih.Equals(items.docs[0].LotteryTime))
+                .FirstOrDefault();
+
+            if (cekilis != null)
+                items = SetWinCounts(items, cekilis.numbers);
+
             using (var client = CloudantClient())
             {
                 var response = await client.PostAsJsonAsync(_dbName + "/_bulk_docs", items);
@@ -245,6 +253,19 @@ namespace CloudantDotNet.Services
                 Console.WriteLine(msg);
                 return JsonConvert.SerializeObject(new { msg = "Failure to POST. Status Code: " + response.StatusCode + ". Reason: " + response.ReasonPhrase });
             }
+        }
+
+        private CouponList SetWinCounts(CouponList items, string numbers)
+        {
+            string[] cekilisNumbers = numbers.Split('-');
+
+            foreach (Coupon item in items.docs)
+            {
+                string[] couponNumbers = item.Numbers.Split('-');
+                item.WinCount = couponNumbers.Where(n => cekilisNumbers.Contains(n)).Count();
+            }
+
+            return items;
         }
 
         public async Task<dynamic> GetAllByUserName(string userName)

@@ -51,22 +51,44 @@ namespace CloudantDotNet.Services
             throw new NotImplementedException();
         }
 
+        public async Task<List<Cekilis>> GetAllAsync()
+        {
+            CekilisSelector cekSelector = CekilisSelector.Build(25);
+            List<Cekilis> returnVal = new List<Cekilis>();
+
+            using (var client = CloudantClient())
+            {
+                var response = await client.PostAsJsonAsync(_dbName + "/_find", cekSelector);
+                if (response.IsSuccessStatusCode)
+                {
+                    string cekilisJson = await response.Content.ReadAsStringAsync();
+                    JToken ob = JObject.Parse(cekilisJson);
+                    JArray arr = (JArray)ob.SelectToken("docs");
+                    Cekilis cekilis = null;
+                    if (arr != null && arr.Count > 0)
+                    {
+                        foreach (var item in arr)
+                        {
+                            cekilis = new Cekilis()
+                            {
+                                tarih = (string)item["tarih"],
+                                tarih_view = (string)item["tarih_view"],
+                                numbers = (string)item["numbers"]
+                            };
+                            returnVal.Add(cekilis);
+                        }
+                        return returnVal;
+                    }
+                }
+                string msg = "Failure to GET. Status Code: " + response.StatusCode + ". Reason: " + response.ReasonPhrase;
+                Console.WriteLine(msg);
+                return returnVal;
+            }
+        }
+
         public async Task<Cekilis> GetAsync()
         {
-            CekilisSelector cekSelector = new CekilisSelector();
-            cekSelector.selector = new CekilisSelector.Selector();
-            cekSelector.selector.tarih = new CekilisSelector.tarih();
-            cekSelector.selector.tarih.gt = 0;
-            cekSelector.fields = new List<string>();
-            cekSelector.fields.Add("tarih");
-            cekSelector.fields.Add("tarih_view");
-            cekSelector.fields.Add("numbers");
-            cekSelector.limit = 1;
-            cekSelector.sort = new List<CekilisSelector.Sort>();
-            cekSelector.sort.Add(new CekilisSelector.Sort()
-            {
-                tarih = "desc"
-            });
+            CekilisSelector cekSelector = CekilisSelector.Build(1);
 
             using (var client = CloudantClient())
             {

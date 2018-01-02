@@ -8,6 +8,7 @@ using Newtonsoft.Json.Linq;
 using CloudantDotNet.Services;
 using CloudantDotNet.Tasks;
 using System.Text.Encodings.Web;
+using dotnetCloudantWebstarter.Cache;
 
 namespace CloudantDotNet
 {
@@ -65,8 +66,11 @@ namespace CloudantDotNet
             var firebaseService = new FirebasePushService();
             
             jobManager = new JobManager(cekilisCloudantService, couponsCloudantService, mpService, userService, firebaseService);
+            CekilisCache cekilisCache = new CekilisCache(cekilisCloudantService);
+
             services.AddSingleton(typeof(CloudantDotNet.Models.Creds), creds);
             services.AddSingleton(typeof(JobManager), jobManager);
+            services.AddSingleton(typeof(CekilisCache), cekilisCache);
             services.AddTransient<ICouponsCloudantService, CouponsCloudantService>();
             services.AddTransient<ICekilisCloudantService, CekilisCloudantService>();
             services.AddTransient<IUserCloudantService, UserCloudantService>();

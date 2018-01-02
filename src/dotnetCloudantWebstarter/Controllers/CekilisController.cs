@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using CloudantDotNet.Models;
 using CloudantDotNet.Services;
+using dotnetCloudantWebstarter.Cache;
+using System.Linq;
 
 // For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -20,14 +22,14 @@ namespace CloudantDotNet.Controllers
             _cloudantService = cloudantService;
         }
 
-        // GET: api/values
+        // GET: api/cekilis
         [HttpGet]
-        public async Task<dynamic> GetLast()
+        public dynamic GetLast()
         {
-            return await _cloudantService.GetAsync();
+            return CekilisCache.cekilisList.Last();
         }
 
-        // POST api/values
+        // POST api/cekilis
         [HttpPost]
         public async Task<dynamic> Post([FromBody]Cekilis item)
         {
