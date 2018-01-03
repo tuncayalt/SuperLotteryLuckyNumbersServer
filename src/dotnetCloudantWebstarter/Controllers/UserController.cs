@@ -37,6 +37,9 @@ namespace CloudantDotNet.Controllers
             userReq.recent_token = (string.IsNullOrWhiteSpace(userReq.recent_token)) ? "" : userReq.recent_token;
             userReq.user_id = (string.IsNullOrWhiteSpace(userReq.user_id)) ? "" : userReq.user_id;
 
+            Console.WriteLine("SaveToken user_id:" + userReq.user_id);
+            Console.WriteLine("SaveToken recent_token:" + userReq.recent_token);
+
             try
             {
                 List<User> userList = await _cloudantService.GetTokenAsync(userReq.prev_token);
@@ -87,6 +90,9 @@ namespace CloudantDotNet.Controllers
             userReq.prev_token = (string.IsNullOrWhiteSpace(userReq.prev_token)) ? "" : userReq.prev_token;
             userReq.recent_token = (string.IsNullOrWhiteSpace(userReq.recent_token)) ? "" : userReq.recent_token;
             userReq.user_id = (string.IsNullOrWhiteSpace(userReq.user_id)) ? "" : userReq.user_id;
+
+            Console.WriteLine("SaveUser user_id:" + userReq.user_id);
+            Console.WriteLine("SaveUser recent_token:" + userReq.recent_token);
 
             try
             {

@@ -232,15 +232,16 @@ namespace CloudantDotNet.Services
 
         public async Task<dynamic> CreateListAsync(CouponList items)
         {
+            if (items == null || items.docs == null || !items.docs.Any())
+                return false;
+
             items.docs.ForEach(c => c.ServerCalled = "T");
 
-            Cekilis cekilis = CekilisCache.cekilisList
-                .Where(c => c.tarih.Equals(items.docs[0].LotteryTime))
-                .FirstOrDefault();
+            //Console.WriteLine("item tarih:" + items.docs[0].LotteryTime);
+            //Console.WriteLine("cekilis tarih:" + CekilisCache.cekilisList[0].tarih);
 
-            if (cekilis != null)
-                items = SetWinCounts(items, cekilis.numbers);
-
+            items = SetWinCounts(items);
+                
             using (var client = CloudantClient())
             {
                 var response = await client.PostAsJsonAsync(_dbName + "/_bulk_docs", items);
@@ -255,14 +256,21 @@ namespace CloudantDotNet.Services
             }
         }
 
-        private CouponList SetWinCounts(CouponList items, string numbers)
+        private CouponList SetWinCounts(CouponList items)
         {
-            string[] cekilisNumbers = numbers.Split('-');
-
             foreach (Coupon item in items.docs)
             {
-                string[] couponNumbers = item.Numbers.Split('-');
-                item.WinCount = couponNumbers.Where(n => cekilisNumbers.Contains(n)).Count();
+                string itemDate = item.LotteryTime.Replace("/", "");
+                Cekilis cekilis = CekilisCache.cekilisList
+                    .Where(c => c.tarih.Equals(itemDate))
+                    .FirstOrDefault();
+
+                if (cekilis != null)
+                {
+                    string[] cekilisNumbers = cekilis.numbers.Split('-');
+                    string[] couponNumbers = item.Numbers.Split('-');
+                    item.WinCount = couponNumbers.Where(n => cekilisNumbers.Contains(n)).Count();
+                }
             }
 
             return items;

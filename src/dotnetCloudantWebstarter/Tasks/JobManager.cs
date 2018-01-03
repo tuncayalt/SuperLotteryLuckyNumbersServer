@@ -100,7 +100,6 @@ namespace CloudantDotNet.Tasks
         {
             foreach (IJob job in jobs.ToList())
             {
-                Console.WriteLine("JobManager loop");
                 if (JobWillStart(job))
                 {
                     job.StartJob();

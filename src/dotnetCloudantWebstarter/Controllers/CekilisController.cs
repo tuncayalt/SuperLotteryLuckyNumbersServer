@@ -13,9 +13,9 @@ namespace CloudantDotNet.Controllers
     public class CekilisController : Controller
     {
         private readonly ICekilisCloudantService _cloudantService;
-        string oyunTuru = "superloto";
-        string urlTarihler = @"http://www.millipiyango.gov.tr/sonuclar/listCekilisleriTarihleri.php?tur=";
-        string urlNumaralar = @"http://www.millipiyango.gov.tr/sonuclar/cekilisler/";
+        //string oyunTuru = "superloto";
+        //string urlTarihler = @"http://www.millipiyango.gov.tr/sonuclar/listCekilisleriTarihleri.php?tur=";
+        //string urlNumaralar = @"http://www.millipiyango.gov.tr/sonuclar/cekilisler/";
 
         public CekilisController(ICekilisCloudantService cloudantService)
         {
