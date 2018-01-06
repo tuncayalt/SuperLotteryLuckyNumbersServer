@@ -3,9 +3,9 @@ applications:
   memory: 256M
   instances: 1
   domain: eu-gb.mybluemix.net
-  name: SuperLotteryLuckyNumbersDev
-  host: SuperLotteryLuckyNumbersDev
+  name: TempName
+  host: TempHost
   disk_quota: 1024M
   services:
   - availability-monitoring-auto
-  - SuperLotteryLuckyNumbersServerDev-cloudantNoSQLDB
+  - TempCloudantName
