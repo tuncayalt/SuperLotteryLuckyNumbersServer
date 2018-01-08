@@ -1,7 +1,10 @@
 ﻿using CloudantDotNet.Models;
 using CloudantDotNet.Services;
+using dotnetCloudantWebstarter.Cache;
+using dotnetCloudantWebstarter.Constant;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace CloudantDotNet.Tasks
@@ -31,9 +34,31 @@ namespace CloudantDotNet.Tasks
 
         public void StartJob()
         {
-            SendPushToUsers().Wait();
+            SendPushToTopic(Constant.superLotoTopic).Wait();
 
             Console.WriteLine("CekilisPushJob ran:" + DateTime.UtcNow.GetTurkeyTime());
+        }
+
+        private async Task SendPushToTopic(string topic)
+        {
+            try
+            {
+                Cekilis cekilis = CekilisCache.cekilisList.Last();
+                if (cekilis == null)
+                    return;
+
+                PushNotificationToTopic push = PushNotificationToTopic.Build(cekilis.numbers, cekilis.tarih_view, topic);
+                bool pushResult = await _pushService.SendPush(push);
+                if (!pushResult)
+                {
+                    Console.WriteLine("CekilisPushJob.SendPushToTopic false.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("CekilisPushJob.SendPushToTopic hata. " + ex.StackTrace);
+            }
+            PushFinished();
         }
 
         private async Task SendPushToUsers()

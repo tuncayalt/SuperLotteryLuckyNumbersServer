@@ -1,5 +1,6 @@
 ﻿using CloudantDotNet.Models;
 using CloudantDotNet.Services;
+using dotnetCloudantWebstarter.Cache;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,7 +43,7 @@ namespace CloudantDotNet.Tasks
 
         private async Task UpdateUserWinCounts()
         {
-            Cekilis cekilis = await _cekilisService.GetAsync();
+            Cekilis cekilis = CekilisCache.cekilisList.Last();
             if (cekilis == null)
                 return;
 

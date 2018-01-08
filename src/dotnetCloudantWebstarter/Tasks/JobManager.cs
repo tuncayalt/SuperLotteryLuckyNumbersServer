@@ -27,7 +27,7 @@ namespace CloudantDotNet.Tasks
             jobs = new List<IJob>();
             AddCekilisJob();
 
-            CallJobsRepeatedly(TimeSpan.FromSeconds(45));
+            CallJobsRepeatedly(TimeSpan.FromSeconds(60));
         }
 
         private void AddCekilisJob()

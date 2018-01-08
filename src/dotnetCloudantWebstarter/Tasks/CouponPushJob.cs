@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CloudantDotNet.Services;
 using CloudantDotNet.Models;
+using dotnetCloudantWebstarter.Cache;
 
 namespace CloudantDotNet.Tasks
 {
@@ -42,39 +43,52 @@ namespace CloudantDotNet.Tasks
 
         private async Task SendCouponPushToUsers()
         {
-            Cekilis cekilis = await _cekilisService.GetAsync();
-            if (cekilis == null)
-                return;
-
-            List<User> userList = await _userService.GetPushCekilis();
-            if (userList == null || !userList.Any())
+            try
             {
-                CouponPushFinished();
-                return;
-            }
+                Cekilis cekilis = CekilisCache.cekilisList.Last();
+                if (cekilis == null)
+                    return;
 
-            foreach (User user in userList)
-            {
-                List<Coupon> couponList = await _couponsService.GetAllByUserNameAndTarih(user.user_id, cekilis.tarih);
-                if (couponList == null || !couponList.Any())
-                    continue;
-                if (!couponList.Any(c => c.WinCount >= 3))
-                    continue;
-
-                int maxWinCount = couponList.Max(c => c.WinCount);
-                PushNotification push = PushNotificationCoupon.Build(maxWinCount, cekilis.tarih_view, user.token);
-                try
+                List<User> userList = await _userService.GetPushCekilis();
+                if (userList == null || !userList.Any())
                 {
-                    await _pushService.SendPush(push);
-                }
-                catch (Exception)
-                {
-                    Console.WriteLine("Cant send push to user:" + user.user_id);
+                    CouponPushFinished();
+                    return;
                 }
 
-                await Task.Delay(100);
-            }
+                foreach (User user in userList)
+                {
+                    try
+                    {
+                        List<Coupon> couponList = await _couponsService.GetAllByUserNameAndTarih(user.user_id, cekilis.tarih);
+                        if (couponList == null || !couponList.Any())
+                            continue;
+                        if (!couponList.Any(c => c.WinCount >= 3))
+                            continue;
 
+                        int maxWinCount = couponList.Max(c => c.WinCount);
+                        PushNotification push = PushNotificationCoupon.Build(maxWinCount, cekilis.tarih_view, user.token);
+
+                        bool pushResult = await _pushService.SendPush(push);
+                        if (!pushResult)
+                        {
+                            user.push_cekilis = "F";
+                            user.push_win = "F";
+                            await _userService.UpdateAsync(user);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("CouponPushJob.SendCouponPushToUsers, user:" + user.user_id + " " + ex.StackTrace);
+                    }
+
+                    await Task.Delay(100);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("CouponPushJob.SendCouponPushToUsers hata. " + ex.StackTrace);
+            }
             CouponPushFinished();
         }
 
