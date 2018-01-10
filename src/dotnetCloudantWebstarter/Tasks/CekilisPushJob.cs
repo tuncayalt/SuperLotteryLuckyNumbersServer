@@ -1,7 +1,6 @@
 ﻿using CloudantDotNet.Models;
 using CloudantDotNet.Services;
 using dotnetCloudantWebstarter.Cache;
-using dotnetCloudantWebstarter.Constant;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,7 +33,7 @@ namespace CloudantDotNet.Tasks
 
         public void StartJob()
         {
-            SendPushToTopic(Constant.superLotoTopic).Wait();
+            SendPushToTopic(ConfigCache.config.superLotoTopic).Wait();
 
             Console.WriteLine("CekilisPushJob ran:" + DateTime.UtcNow.GetTurkeyTime());
         }

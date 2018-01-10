@@ -9,6 +9,7 @@ using CloudantDotNet.Services;
 using CloudantDotNet.Tasks;
 using System.Text.Encodings.Web;
 using dotnetCloudantWebstarter.Cache;
+using dotnetCloudantWebstarter.Services;
 
 namespace CloudantDotNet
 {
@@ -62,15 +63,18 @@ namespace CloudantDotNet
             var cekilisCloudantService = new CekilisCloudantService(creds, UrlEncoder.Default);
             var couponsCloudantService = new CouponsCloudantService(creds, UrlEncoder.Default);
             var userService = new UserCloudantService(creds, UrlEncoder.Default);
+            var configCloudantService = new ConfigCloudantService(creds, UrlEncoder.Default);
             var mpService = new MilliPiyangoService();
             var firebaseService = new FirebasePushService();
             
             jobManager = new JobManager(cekilisCloudantService, couponsCloudantService, mpService, userService, firebaseService);
             CekilisCache cekilisCache = new CekilisCache(cekilisCloudantService);
+            ConfigCache configCache = new ConfigCache(configCloudantService);
 
             services.AddSingleton(typeof(CloudantDotNet.Models.Creds), creds);
             services.AddSingleton(typeof(JobManager), jobManager);
             services.AddSingleton(typeof(CekilisCache), cekilisCache);
+            services.AddSingleton(typeof(ConfigCache), configCache);
             services.AddTransient<ICouponsCloudantService, CouponsCloudantService>();
             services.AddTransient<ICekilisCloudantService, CekilisCloudantService>();
             services.AddTransient<IUserCloudantService, UserCloudantService>();
