@@ -55,6 +55,50 @@ namespace CloudantDotNet.Services
             throw new NotImplementedException();
         }
 
+        public async Task<List<User>> GetAllByUserIds(List<string> userIdList)
+        {
+            UserTokenSelectorByBulkId userSelector = UserTokenSelectorByBulkId.Build(userIdList);
+
+            using (var client = CloudantClient())
+            {
+                List<User> userList = null;
+                var response = await client.PostAsJsonAsync(_dbName + "/_find", userSelector);
+                if (response.IsSuccessStatusCode)
+                {
+                    string userJson = await response.Content.ReadAsStringAsync();
+                    JToken ob = JObject.Parse(userJson);
+                    JArray arr = (JArray)ob.SelectToken("docs");
+                    User user = null;
+                    if (arr != null && arr.Any())
+                    {
+                        userList = new List<User>();
+                        foreach (var item in arr)
+                        {
+                            user = new User()
+                            {
+                                _id = (string)item["_id"],
+                                _rev = (string)item["_rev"],
+                                token = (string)item["token"],
+                                user_id = (string)item["user_id"],
+                                push_cekilis = (string)item["push_cekilis"],
+                                push_win = (string)item["push_win"],
+                                time = (string)item["time"]
+                            };
+                            userList.Add(user);
+                        }
+                    }
+                }
+                else
+                {
+                    string msg = "Failure to GET. Status Code: " + response.StatusCode + ". Reason: " + response.ReasonPhrase;
+                    Console.WriteLine(msg);
+                }
+
+                return userList;
+            }
+
+        }
+
         public async Task<List<User>> GetPushCekilis()
         {
             UserPushCekilisSelector userSelector = UserPushCekilisSelector.Build();

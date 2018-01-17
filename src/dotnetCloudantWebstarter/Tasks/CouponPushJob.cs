@@ -36,9 +36,76 @@ namespace CloudantDotNet.Tasks
 
         public void StartJob()
         {
-            SendCouponPushToUsers().Wait();
+            //SendCouponPushToUsers().Wait();
+            SendPushToWinners().Wait();
 
             Console.WriteLine("CouponPushJob ran:" + DateTime.UtcNow.GetTurkeyTime());
+        }
+
+        private async Task SendPushToWinners()
+        {
+            try
+            {
+                Cekilis cekilis = CekilisCache.cekilisList.Last();
+                if (cekilis == null)
+                    return;
+
+                List<Coupon> winnerCouponList = await _couponsService.GetAllByWinCountAndTarih(cekilis.tarih);
+                if (winnerCouponList == null || !winnerCouponList.Any())
+                {
+                    CouponPushFinished();
+                    return;
+                }
+                Dictionary<string, int> userDict = new Dictionary<string, int>();
+                foreach (Coupon item in winnerCouponList)
+                {
+                    if (!userDict.ContainsKey(item.User) || userDict[item.User] < item.WinCount) {
+                        userDict[item.User] = item.WinCount;
+                    }
+                }
+
+                List<User> winnerUserList = await _userService.GetAllByUserIds(userDict.Keys.ToList());
+                if (winnerUserList == null || !winnerUserList.Any())
+                {
+                    CouponPushFinished();
+                    return;
+                }
+
+                var winnerUsersToPushList =  winnerUserList.Where(u => u.push_cekilis.Equals("T")).ToList();
+                if (winnerUsersToPushList == null || !winnerUsersToPushList.Any())
+                {
+                    CouponPushFinished();
+                    return;
+                }
+
+                foreach (var user in winnerUsersToPushList)
+                {
+                    try
+                    {
+                        PushNotification push = PushNotificationCoupon.Build(userDict[user.user_id], cekilis.tarih_view, user.token);
+
+                        bool pushResult = await _pushService.SendPush(push);
+                        if (!pushResult)
+                        {
+                            user.push_cekilis = "F";
+                            user.push_win = "F";
+                            await _userService.UpdateAsync(user);
+                            Console.WriteLine("CouponPushJob winner: " + user.user_id + " won:" + userDict[user.user_id]);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("CouponPushJob.SendPushToWinners, user:" + user.user_id + " " + ex.StackTrace);
+                    }
+                    await Task.Delay(300);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("CouponPushJob.SendPushToWinners hata. " + ex.StackTrace);
+            }
+            CouponPushFinished();
         }
 
         private async Task SendCouponPushToUsers()

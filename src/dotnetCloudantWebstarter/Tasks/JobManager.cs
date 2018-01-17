@@ -63,16 +63,17 @@ namespace CloudantDotNet.Tasks
         private void CouponUpdateFinishedInvoked(object sender, UpdateCouponEventArgs e)
         {
             RemoveJob(e.job);
+            AddCekilisPushJob();
+        }
+
+        
+        private void CekilisPushFinishedInvoked(object sender, PushCekilisEventArgs e)
+        {
+            RemoveJob(e.job);
             AddCouponPushJob();
         }
 
         private void CouponPushFinishedInvoked(object sender, PushCouponEventArgs e)
-        {
-            RemoveJob(e.job);
-            AddCekilisPushJob();
-        }
-
-        private void CekilisPushFinishedInvoked(object sender, PushCekilisEventArgs e)
         {
             RemoveJob(e.job);
         }

@@ -19,5 +19,6 @@ namespace CloudantDotNet.Services
         Task<List<CouponDto>> GetWithLimitByTarih(string tarih, int updateCouponCount);
         Task<dynamic> DeleteBulkAsync(CouponListToDeleteDto items);
         Task<dynamic> GetListByCouponIds(List<string> couponIds);
+        Task<dynamic> GetAllByWinCountAndTarih(string tarih);
     }
 }

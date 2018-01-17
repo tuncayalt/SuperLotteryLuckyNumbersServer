@@ -368,6 +368,25 @@ namespace CloudantDotNet.Services
                 return new List<CouponListToDeleteDto>();
             }
         }
+
+        public async Task<dynamic> GetAllByWinCountAndTarih(string tarih)
+        {
+            string lotteryTime = tarih.Substring(0, 4) + "/" + tarih.Substring(4, 2) + "/" + tarih.Substring(6, 2);
+            CouponSelectorByWinCountAndTarih couponSelector = CouponSelectorByWinCountAndTarih.Build(lotteryTime);
+            using (var client = CloudantClient())
+            {
+                var response = await client.PostAsJsonAsync(_dbName + "/_find", couponSelector);
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseJson = await response.Content.ReadAsStringAsync();
+                    CouponList couponList = JsonConvert.DeserializeObject<CouponList>(responseJson);
+                    return couponList.docs;
+                }
+                string msg = "Failure to GET. Status Code: " + response.StatusCode + ". Reason: " + response.ReasonPhrase;
+                Console.WriteLine(msg);
+                return new List<Coupon>();
+            }
+        }
     }
 
     class LoggingHandler : DelegatingHandler

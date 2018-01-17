@@ -12,5 +12,6 @@ namespace CloudantDotNet.Services
         Task<dynamic> GetUserAsync(string userMail);
         Task<List<User>> GetPushCekilis();
         Task<bool> UpdateAsync(User item);
+        Task<List<User>> GetAllByUserIds(List<string> list);
     }
 }
