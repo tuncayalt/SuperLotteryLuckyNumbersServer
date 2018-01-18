@@ -1,6 +1,6 @@
 applications:
 - path: .
-  memory: 360M
+  memory: xxxM
   instances: 1
   domain: eu-gb.mybluemix.net
   name: TempName
