@@ -17,7 +17,7 @@ namespace CloudantDotNet.Tasks
         public int endMin { get; set; } = 59;
         public TimeSpan onceIn { get; set; } = TimeSpan.FromMinutes(1);
         public DateTime lastWorked { get; set; }
-        public int updateCouponCount { get; set; } = 300;
+        public int updateCouponCount { get; set; } = 600;
 
         ICekilisCloudantService _cekilisService;
         IUserCloudantService _userService;
