@@ -9,6 +9,7 @@ using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using System.Linq;
 using dotnetCloudantWebstarter.Cache;
+using CloudantDotNet.Extensions;
 
 namespace CloudantDotNet.Services
 {
@@ -17,21 +18,24 @@ namespace CloudantDotNet.Services
         private static readonly string _dbName = "coupon";
         private readonly Creds _cloudantCreds;
         private readonly UrlEncoder _urlEncoder;
+        private readonly IHttpClientFactory _factory;
 
-        public CouponsCloudantService(Creds creds, UrlEncoder urlEncoder)
+        public CouponsCloudantService(Creds creds, IHttpClientFactory factory)
         {
             _cloudantCreds = creds;
-            _urlEncoder = urlEncoder;
+            _urlEncoder = UrlEncoder.Default;
+            _factory = factory;
         }
 
         public async Task<dynamic> CreateAsync(Coupon item)
         {
             using (var client = CloudantClient())
             {
-                var response = await client.PostAsJsonAsync(_dbName, item);
+                var response = await client.PostAsync(_dbName, new StringContent(JsonConvert.SerializeObject(item), Encoding.UTF8, "application/json"));
                 if (response.IsSuccessStatusCode)
                 {
-                    var responseJson = await response.Content.ReadAsAsync<Coupon>();
+                    var responseJsonString = await response.Content.ReadAsStringAsync();
+                    var responseJson = JsonConvert.DeserializeObject(responseJsonString) as Coupon;
                     return JsonConvert.SerializeObject(
                         new
                         {
@@ -64,7 +68,7 @@ namespace CloudantDotNet.Services
             using (var client = CloudantClient())
             {
                 CouponDto item = null;
-                var response = await client.PostAsJsonAsync(_dbName + "/_find", couponSelector);
+                var response = await client.PostAsync(_dbName + "/_find", new StringContent(JsonConvert.SerializeObject(couponSelector), Encoding.UTF8, "application/json"));
                 if (response.IsSuccessStatusCode)
                 {
 
@@ -92,7 +96,7 @@ namespace CloudantDotNet.Services
         {
             using (var client = CloudantClient())
             {
-                var response = await client.PostAsJsonAsync(_dbName + "/_bulk_docs", items);
+                var response = await client.PostAsync(_dbName + "/_bulk_docs", new StringContent(JsonConvert.SerializeObject(items), Encoding.UTF8, "application/json"));
                 if (response.IsSuccessStatusCode)
                 {
                     return true;
@@ -123,7 +127,7 @@ namespace CloudantDotNet.Services
             CouponSelectorForId couponSelector = CouponSelectorForId.Build(couponId);
             using (var client = CloudantClient())
             {
-                var response = await client.PostAsJsonAsync(_dbName + "/_find", couponSelector);
+                var response = await client.PostAsync(_dbName + "/_find", new StringContent(JsonConvert.SerializeObject(couponSelector), Encoding.UTF8, "application/json"));
                 if (response.IsSuccessStatusCode)
                 {
                     var responseJson = await response.Content.ReadAsStringAsync();
@@ -141,7 +145,7 @@ namespace CloudantDotNet.Services
         {
             using (var client = CloudantClient())
             {
-                var response = await client.PutAsJsonAsync(_dbName + "/" + _urlEncoder.Encode(item.id.ToString()) + "?rev=" + _urlEncoder.Encode(item.rev.ToString()), item);
+                var response = await client.PutAsync(_dbName + "/" + _urlEncoder.Encode(item.id.ToString()) + "?rev=" + _urlEncoder.Encode(item.rev.ToString()), new StringContent(JsonConvert.SerializeObject(item), Encoding.UTF8, "application/json"));
                 if (response.IsSuccessStatusCode)
                 {
                     var responseJson = await response.Content.ReadAsAsync<Coupon>();
@@ -222,7 +226,7 @@ namespace CloudantDotNet.Services
 
             var auth = Convert.ToBase64String(Encoding.ASCII.GetBytes(_cloudantCreds.username + ":" + _cloudantCreds.password));
 
-            HttpClient client = HttpClientFactory.Create(new LoggingHandler());
+            HttpClient client = _factory.CreateClient();
             client.BaseAddress = new Uri("https://" + _cloudantCreds.host);
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));

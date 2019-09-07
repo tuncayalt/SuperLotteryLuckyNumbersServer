@@ -7,6 +7,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace CloudantDotNet.Services
 {
@@ -14,22 +15,23 @@ namespace CloudantDotNet.Services
     {
         private static readonly string _dbName = "cekilis";
         private readonly Creds _cloudantCreds;
-        private readonly UrlEncoder _urlEncoder;
+        private readonly IHttpClientFactory _factory;
 
-        public CekilisCloudantService(Creds creds, UrlEncoder urlEncoder)
+        public CekilisCloudantService(Creds creds, IHttpClientFactory factory)
         {
             _cloudantCreds = creds;
-            _urlEncoder = urlEncoder;
+            _factory = factory;
         }
 
         public async Task<Cekilis> CreateAsync(Cekilis item)
         {
             using (var client = CloudantClient())
             {
-                var response = await client.PostAsJsonAsync(_dbName, item);
+                var response = await client.PostAsync(_dbName, new StringContent(JsonConvert.SerializeObject(item), Encoding.UTF8, "application/json"));
                 if (response.IsSuccessStatusCode)
                 {
-                    var responseJson = await response.RequestMessage.Content.ReadAsAsync<Cekilis>();
+                    var responseJsonString = await response.RequestMessage.Content.ReadAsStringAsync();
+                    var responseJson = JsonConvert.DeserializeObject(responseJsonString) as Cekilis;
 
                     return new Cekilis()
                     {
@@ -58,7 +60,7 @@ namespace CloudantDotNet.Services
 
             using (var client = CloudantClient())
             {
-                var response = await client.PostAsJsonAsync(_dbName + "/_find", cekSelector);
+                var response = await client.PostAsync(_dbName + "/_find", new StringContent(JsonConvert.SerializeObject(cekSelector), Encoding.UTF8, "application/json"));
                 if (response.IsSuccessStatusCode)
                 {
                     string cekilisJson = await response.Content.ReadAsStringAsync();
@@ -92,7 +94,7 @@ namespace CloudantDotNet.Services
 
             using (var client = CloudantClient())
             {
-                var response = await client.PostAsJsonAsync(_dbName + "/_find", cekSelector);
+                var response = await client.PostAsync(_dbName + "/_find", new StringContent(JsonConvert.SerializeObject(cekSelector), Encoding.UTF8, "application/json"));
                 if (response.IsSuccessStatusCode)
                 {
                     string cekilisJson = await response.Content.ReadAsStringAsync();
@@ -135,7 +137,7 @@ namespace CloudantDotNet.Services
 
             var auth = Convert.ToBase64String(Encoding.ASCII.GetBytes(_cloudantCreds.username + ":" + _cloudantCreds.password));
 
-            HttpClient client = HttpClientFactory.Create(new LoggingHandler());
+            HttpClient client = _factory.CreateClient();
             client.BaseAddress = new Uri("https://" + _cloudantCreds.host);
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));

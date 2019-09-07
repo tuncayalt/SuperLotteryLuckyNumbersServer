@@ -8,6 +8,7 @@ using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using CloudantDotNet.Models;
 using dotnetCloudantWebstarter.Models;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace dotnetCloudantWebstarter.Services
@@ -16,12 +17,12 @@ namespace dotnetCloudantWebstarter.Services
     {
         private static readonly string _dbName = "config";
         private readonly Creds _cloudantCreds;
-        private readonly UrlEncoder _urlEncoder;
+        private readonly IHttpClientFactory _factory;
 
-        public ConfigCloudantService(Creds creds, UrlEncoder urlEncoder)
+        public ConfigCloudantService(Creds creds, IHttpClientFactory factory)
         {
             _cloudantCreds = creds;
-            _urlEncoder = urlEncoder;
+            _factory = factory;
         }
 
         public async Task<Config> GetAsync()
@@ -30,7 +31,7 @@ namespace dotnetCloudantWebstarter.Services
 
             using (var client = CloudantClient())
             {
-                var response = await client.PostAsJsonAsync(_dbName + "/_find", configSelector);
+                var response = await client.PostAsync(_dbName + "/_find", new StringContent(JsonConvert.SerializeObject(configSelector), Encoding.UTF8, "application/json"));
                 if (response.IsSuccessStatusCode)
                 {
                     string result = await response.Content.ReadAsStringAsync();
@@ -62,7 +63,7 @@ namespace dotnetCloudantWebstarter.Services
 
             var auth = Convert.ToBase64String(Encoding.ASCII.GetBytes(_cloudantCreds.username + ":" + _cloudantCreds.password));
 
-            HttpClient client = HttpClientFactory.Create(new LoggingHandler());
+            HttpClient client = _factory.CreateClient();
             client.BaseAddress = new Uri("https://" + _cloudantCreds.host);
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));

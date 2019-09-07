@@ -15,7 +15,12 @@ namespace CloudantDotNet.Services
         string oyunTuru = "superloto";
         string urlTarihler = @"listCekilisleriTarihleri.php?tur=";
         string urlNumaralar = @"cekilisler/";
+        private readonly IHttpClientFactory _factory;
 
+        public MilliPiyangoService(IHttpClientFactory factory)
+        {
+            _factory = factory;
+        }
 
         public async Task<dynamic> GetCekilisFromMP(DateTime dateInMP)
         {
@@ -97,7 +102,7 @@ namespace CloudantDotNet.Services
 
         private HttpClient MilliPiyangoClient()
         {
-            HttpClient client = HttpClientFactory.Create(new LoggingHandler());
+            HttpClient client = _factory.CreateClient();
             client.BaseAddress = new Uri(baseAddress);
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));

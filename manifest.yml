@@ -1,0 +1,11 @@
+applications:
+- path: .
+  memory: 360M
+  instances: 1
+  domain: eu-gb.mybluemix.net
+  name: TempName
+  host: TempHost
+  disk_quota: 1024M
+  services:
+  - availability-monitoring-auto
+  - SuperLotteryLuckyNumbersServer-cloudantNoSQLDB

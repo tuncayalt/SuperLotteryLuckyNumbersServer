@@ -1,4 +1,5 @@
-﻿using CloudantDotNet.Models;
+﻿using CloudantDotNet.Extensions;
+using CloudantDotNet.Models;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -16,12 +17,15 @@ namespace CloudantDotNet.Services
 
         private static readonly string _dbName = "user";
         private readonly Creds _cloudantCreds;
+        private readonly IHttpClientFactory _factory;
         private readonly UrlEncoder _urlEncoder;
 
-        public UserCloudantService(Creds creds, UrlEncoder urlEncoder)
+        public UserCloudantService(Creds creds, IHttpClientFactory factory)
         {
             _cloudantCreds = creds;
-            _urlEncoder = urlEncoder;
+            _factory = factory;
+            _urlEncoder = UrlEncoder.Default;
+
         }
 
         public async Task<bool> CreateAsync(User userInput)
@@ -255,7 +259,7 @@ namespace CloudantDotNet.Services
 
             var auth = Convert.ToBase64String(Encoding.ASCII.GetBytes(_cloudantCreds.username + ":" + _cloudantCreds.password));
 
-            HttpClient client = HttpClientFactory.Create(new LoggingHandler());
+            HttpClient client = _factory.CreateClient();
             client.BaseAddress = new Uri("https://" + _cloudantCreds.host);
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
